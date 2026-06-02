@@ -1354,6 +1354,10 @@ class Binder(BaseBinaryFile):
     ) -> list[BinderEntry]:
         return self.find_entries_by_name_regex(pattern, flags=flags, escape=escape)
 
+    # Compatibility alias for io_soulstruct Blender operators (expects find_entry_id).
+    def find_entry_id(self, entry_id: int) -> BinderEntry:
+        return self.find_entry_by_id(entry_id)
+
     def __getitem__(self, entry_spec: int | Path | str | re.Pattern) -> BinderEntry:
         """Convenient shortcut for finding an entry by ID (int), full path (Path), name only (str), or by matching
         its name with regex (`re.Pattern`).
