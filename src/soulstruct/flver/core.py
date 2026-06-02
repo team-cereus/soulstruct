@@ -16,7 +16,7 @@ from soulstruct.containers import Binder, TPF
 from soulstruct.utilities.binary import *
 from soulstruct.utilities.maths import AABB, EulerRad, Vector3, Vector4, Matrix3, SINGLE_MIN, SINGLE_MAX
 
-from .bone import FLVERBone
+from .bone import FLVERBone, link_flver_bones
 from .bone_tools import BoneTree
 from .dummy import Dummy
 from .face_set import FaceSet
@@ -125,7 +125,10 @@ class FLVER(GameFile):
         f2_unk_x5d: byte
         _pad2: bytes = binary_pad(10, init=False)
         f2_unk_x68: int
-        _pad3: bytes = binary_pad(20, init=False)
+        # Former 20-byte `_pad3`. Nightreign (0x20021) stores `0x10` at offset 0x78; ER keeps it zero.
+        _pad3_leading: bytes = binary_pad(8, init=False)
+        f2_unk_x78: int
+        _pad3_trailing: bytes = binary_pad(8, init=False)
 
     big_endian: bool = False
     version: FLVERVersion = FLVERVersion.DarkSouls_A
@@ -150,6 +153,7 @@ class FLVER(GameFile):
     f2_unk_x5c: int = 0
     f2_unk_x5d: int = 0
     f2_unk_x68: int = 0
+    f2_unk_x78: int = 0  # Nightreign FLVER header (0x20021); zero in Elden Ring
 
     # Cached MergedMesh generated from this FLVER. Must be cleared if FLVER is modified.
     _cached_merged_mesh: MergedMesh | None = field(init=False, repr=False, default=None)
@@ -253,6 +257,8 @@ class FLVER(GameFile):
             # Layouts consumed and assigned to mesh vertex arrays.
             material._layouts = None
 
+        link_flver_bones(bones)
+
         return cls(
             big_endian=big_endian,
             version=FLVERVersion(header.version),
@@ -301,7 +307,7 @@ class FLVER(GameFile):
             FLVERMesh.from_flver2_reader(
                 reader,
                 materials,
-                bounding_box_has_unknown=header.version == FLVERVersion.Sekiro_EldenRing,
+                bounding_box_has_unknown=FLVERVersion(header.version).mesh_bounding_box_has_unknown(),
                 index=i,
             )
             for i in range(header.mesh_count)
@@ -361,6 +367,8 @@ class FLVER(GameFile):
             raise ValueError(f"{len(face_sets)} face sets were left over after assignment to meshes.")
         if vertex_arrays:
             raise ValueError(f"{len(vertex_arrays)} vertex arrays were left over after assignment to meshes.")
+
+        link_flver_bones(bones)
 
         return header.to_object(
             cls,
@@ -832,6 +840,14 @@ class FLVER(GameFile):
     def mesh_count(self) -> int:
         return len(self.meshes)
 
+    def any_dynamic(self) -> bool:
+        """True if any submesh is rigged (`FLVERMesh.is_dynamic`). Used by the Blender FLVER importer."""
+        return any(mesh.is_dynamic for mesh in self.meshes)
+
+    def all_dynamic(self) -> bool:
+        """True if every submesh is rigged. Used by the Blender FLVER importer."""
+        return bool(self.meshes) and all(mesh.is_dynamic for mesh in self.meshes)
+
     # endregion
 
     def to_string(self) -> str:
@@ -859,6 +875,10 @@ class FLVER(GameFile):
         """Construct a `BoneTree` from current bones, which makes bone modification/navigation easier."""
         return BoneTree(self)
 
+    def get_bone_armature_space_transforms(self) -> list[tuple[Vector3, Matrix3, Vector3]]:
+        """Accumulated parent transforms per bone (used by Blender FLVER import)."""
+        return self.get_bone_tree().get_bone_armature_space_transforms()
+
     def set_bone_tree(self, bone_tree: BoneTree):
         """Set FLVER bone data from scratch using `bone_tree`."""
         self.bones.clear()
@@ -877,6 +897,7 @@ class FLVER(GameFile):
                 previous_sibling_bone_index=bone_tree.get_bone_index(bone_node.previous_sibling_bone),
             )
             self.bones.append(flver_bone)
+        link_flver_bones(self.bones)
 
     def refresh_mesh_indices(self):
         for i, mesh in enumerate(self.meshes):
@@ -890,6 +911,15 @@ class FLVER(GameFile):
     ) -> MergedMesh:
         """Return a `MergedMesh` object that combines all meshes of this FLVER into a single mesh."""
         return MergedMesh.from_flver(self, mesh_material_indices, material_uv_layer_names, merge_vertices)
+
+    def to_merged_mesh(
+        self,
+        mesh_material_indices: tp.Sequence[int] = None,
+        material_uv_layer_names: tp.Sequence[tp.Sequence[str]] = None,
+        merge_vertices=True,
+    ) -> MergedMesh:
+        """Alias for `build_merged_mesh` (used by the Blender FLVER importer)."""
+        return self.build_merged_mesh(mesh_material_indices, material_uv_layer_names, merge_vertices)
 
     def draw(self, auto_show=False, show_mesh_face_sets=(), show_origin=False, axes=None, **kwargs):
         try:

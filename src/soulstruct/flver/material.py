@@ -71,6 +71,38 @@ class Material:
     # Stored by `FLVER0` just after reading (before reassigning to array users).
     _layouts: list[VertexArrayLayout] | None = None
 
+    def material_dedup_key(self) -> tuple:
+        """Hashable identity for Blender material sharing (`hash(material)` in import)."""
+        return (
+            self.name,
+            self.mat_def_path,
+            self.flags,
+            self.f2_unk_x18,
+            tuple(
+                (
+                    t.path,
+                    t.texture_type,
+                    float(t.scale[0]),
+                    float(t.scale[1]),
+                    t.f2_unk_x10,
+                    t.f2_unk_x11,
+                    t.f2_unk_x14,
+                    t.f2_unk_x18,
+                    t.f2_unk_x1c,
+                )
+                for t in self.textures
+            ),
+            tuple((gx.category, gx.index, gx.data) for gx in self.gx_items),
+        )
+
+    def __hash__(self) -> int:
+        return hash(self.material_dedup_key())
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Material):
+            return NotImplemented
+        return self.material_dedup_key() == other.material_dedup_key()
+
     @classmethod
     def from_flver0_reader(
         cls,

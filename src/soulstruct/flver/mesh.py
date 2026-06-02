@@ -70,7 +70,7 @@ class FLVERMesh:
         _bone_offset: int
         _face_set_count: int
         _face_set_offset: int
-        _vertex_array_count: int = binary(asserted=[1, 2, 3])
+        _vertex_array_count: int  # ER/NR characters may use >3 (e.g. Nightreign c7720)
         _vertex_array_offset: int
 
     # Enabled for rigged meshes designed for animating, which have vertex bone indices/weights (most FLVERs).
@@ -80,7 +80,7 @@ class FLVERMesh:
     material: Material
     default_bone_index: int
     bone_indices: np.ndarray | None  # NOTE: cannot be `None` in `FLVER0` (always a 28-element array)
-    vertex_arrays: list[VertexArray]  # only ever has one element in all known FLVERs
+    vertex_arrays: list[VertexArray]  # usually 1–3; Nightreign may use more per mesh
     face_sets: list[FaceSet]
 
     # Written by FLVER0 versions only:

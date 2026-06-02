@@ -298,6 +298,18 @@ class MatDef(abc.ABC):
         """
         return tuple(self.get_used_uv_layers())
 
+    @property
+    def shader_category(self) -> str:
+        """Special shader category for Blender preview node trees (Water, Snow, etc.)."""
+        if self.NAME_TAG_RE:
+            if self.has_name_tag("Water"):
+                return "Water"
+            if self.has_name_tag("Snow"):
+                return "Snow"
+            if self.has_name_tag("NormalToAlpha"):
+                return "NormalToAlpha"
+        return ""
+
     # region Abstract Methods/Properties
 
     @abc.abstractmethod

@@ -3,6 +3,7 @@ from __future__ import annotations
 __all__ = [
     "FLVERBoneUsageFlags",
     "FLVERBone",
+    "link_flver_bones",
 ]
 
 from dataclasses import dataclass, field
@@ -53,6 +54,17 @@ class FLVERBone:
     child_bone_index: int = -1  # first child (has no previous sibling)
     next_sibling_bone_index: int = -1
     previous_sibling_bone_index: int = -1
+    # In-memory hierarchy (set by `link_flver_bones`; used by Blender import/export). Not serialized.
+    parent_bone: FLVERBone | None = field(default=None, repr=False, compare=False)
+    child_bone: FLVERBone | None = field(default=None, repr=False, compare=False)
+    next_sibling_bone: FLVERBone | None = field(default=None, repr=False, compare=False)
+    previous_sibling_bone: FLVERBone | None = field(default=None, repr=False, compare=False)
+
+    def get_bone_index(self, bones: list[FLVERBone]) -> int:
+        try:
+            return bones.index(self)
+        except ValueError as exc:
+            raise ValueError(f"Bone {self.name!r} is not in the given FLVER bone list.") from exc
 
     @classmethod
     def from_flver_reader(cls, reader: BinaryReader, encoding: str) -> FLVERBone:
@@ -133,3 +145,16 @@ class FLVERBone:
             lines.append(f"  usage_flags = {self.usage_flags} ({flags})")
         lines.append(")")
         return "\n".join(lines)
+
+
+def link_flver_bones(bones: list[FLVERBone]) -> None:
+    """Populate `parent_bone` / sibling / child references from index fields."""
+
+    def _get_bone(index: int) -> FLVERBone | None:
+        return None if index == -1 else bones[index]
+
+    for bone in bones:
+        bone.parent_bone = _get_bone(bone.parent_bone_index)
+        bone.child_bone = _get_bone(bone.child_bone_index)
+        bone.next_sibling_bone = _get_bone(bone.next_sibling_bone_index)
+        bone.previous_sibling_bone = _get_bone(bone.previous_sibling_bone_index)

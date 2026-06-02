@@ -351,10 +351,10 @@ class MergedMesh:
                         merged_field_sources.setdefault(merged_field_name, {}).update({i: (1, va_1_field_name)})
 
                 if basic_merge:
-                    # Fallback: iterate over fields and add them, using the last VA source found.
-                    for extra_vertex_array in mesh.vertex_arrays[1:]:
+                    # Fallback: record which vertex array actually holds each field (NR often splits across 6+ arrays).
+                    for va_index, extra_vertex_array in enumerate(mesh.vertex_arrays[1:], start=1):
                         for field_name in extra_vertex_array.field_names:
-                            merged_field_sources.setdefault(field_name, {}).update({i: (0, field_name)})
+                            merged_field_sources.setdefault(field_name, {}).update({i: (va_index, field_name)})
 
         # Structured array for mixed dtypes.
         all_vertices = np.empty(total_vertex_count, dtype=dtype)  # will be fully initialized

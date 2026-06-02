@@ -85,7 +85,8 @@ class VertexDataFormatEnum(IntEnum):
     FourBytesB = 0x11
     NormalWFirst = 0x12
     FourBytesC = 0x13
-    UV = 0x15  # two shorts
+    UShort2 = 0x17  # 23 decimal; Nightreign bone indices (2x uint16), SoulsFormats `LayoutType.UShort2`
+    UV = 0x15  # two shorts (signed)
     UVPair = 0x16
     ShortBoneIndices = 0x18  # only used for bone indices
     FourShortsToFloats = 0x1A
@@ -119,8 +120,29 @@ VERTEX_FORMAT_ENUM_SIZES = {
     VertexDataFormatEnum.FourShortsToFloats: 8,
     VertexDataFormatEnum.FourShortsToFloatsB: 8,
     VertexDataFormatEnum.FourBytesD: 4,
+    VertexDataFormatEnum.UShort2: 4,
     VertexDataFormatEnum.EdgeCompressed: 1,
 }
+
+
+def _bone_indices_uint16x2_to_int4(compressed: np.ndarray) -> np.ndarray:
+    """Pad two uint16 bone indices to four int32 slots (Nightreign / `UShort2`)."""
+    n = len(compressed)
+    return np.column_stack(
+        [
+            compressed[:, 0].astype(np.int32),
+            compressed[:, 1].astype(np.int32),
+            np.zeros(n, dtype=np.int32),
+            np.zeros(n, dtype=np.int32),
+        ]
+    )
+
+
+def _bone_indices_int4_to_uint16x2(decompressed: np.ndarray) -> np.ndarray:
+    return decompressed[:, :2].astype(np.uint16)
+
+
+BONE_INDICES_USHORT2 = VertexDataCodec(_bone_indices_uint16x2_to_int4, _bone_indices_int4_to_uint16x2)
 
 
 @dataclass(slots=True, frozen=True)
@@ -298,6 +320,11 @@ class VertexBoneIndices(VertexDataType):
             compressed_dtype=[("bone_indices", "h", (4,))],
             decompressed_dtype=[("bone_indices", "i", (4,))],
             # No codec needed; just an integer size change.
+        ),
+        (0x17,): VertexDataFormat(
+            compressed_dtype=[("bone_indices", "H", (2,))],
+            decompressed_dtype=[("bone_indices", "i", (4,))],
+            codec=BONE_INDICES_USHORT2,
         ),
     }
 

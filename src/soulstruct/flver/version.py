@@ -26,6 +26,7 @@ class FLVERVersion(IntEnum):
     Sekiro_TestChr = 0x20016
     Sekiro_EldenRing = 0x2001A
     ArmoredCore6 = 0x2001B
+    Nightreign = 0x20021  # Elden Ring: Nightreign (same FLVER2 family as ER; MATBIN, mesh AABB unknown)
 
     @classmethod
     def default(cls):
@@ -33,6 +34,14 @@ class FLVERVersion(IntEnum):
 
     def is_flver0(self):
         return self.value <= 0x0FFFF
+
+    def uses_matbin(self) -> bool:
+        """From Sekiro/ER onwards, materials use MATBIN instead of MTD."""
+        return self.value >= self.Sekiro_EldenRing
+
+    def mesh_bounding_box_has_unknown(self) -> bool:
+        """Post-DS3 character/map FLVER meshes include an extra float triple in the mesh header."""
+        return self.value >= self.Sekiro_EldenRing
 
     def map_pieces_use_normal_w_bones(self):
         """From Bloodborne onwards, Map Piece FLVER vertices store their singular bone indices in the fourth 8-bit
