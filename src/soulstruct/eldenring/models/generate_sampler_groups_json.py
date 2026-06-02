@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import logging
 from pathlib import Path
 
@@ -7,63 +8,100 @@ from soulstruct.base.models.matbin import MATBIN, MATBINBND
 from soulstruct.config import ELDEN_RING_PATH
 from soulstruct.containers import Binder, BinderEntry, EntryNotFoundError
 from soulstruct.utilities.binary import BinaryReader
-from soulstruct.utilities.files import write_json
+from soulstruct.utilities.files import SOULSTRUCT_PATH, read_json, write_json
 
 _LOGGER = logging.getLogger(__name__)
 
+RESOURCES_DIR = SOULSTRUCT_PATH("eldenring/models/resources")
+ER_SHADER_SAMPLER_GROUPS_PATH = RESOURCES_DIR / "er_shader_sampler_groups.json"
+NR_SHADER_SAMPLER_GROUPS_PATH = RESOURCES_DIR / "nr_shader_sampler_groups.json"
 
-def generate_metaparam(elden_ring_path: Path):
-    matbinbnd = MATBINBND.from_bundled("ELDEN_RING")
-    shaderbdlebnd_path = Path(elden_ring_path, "shader/shaderbdle.shaderbdlebnd.dcx")
-    shaderbdlebnd_dlc01_path = Path(elden_ring_path, "shader/shaderbdle_dlc01.shaderbdlebnd.dcx")
-    shaderbdlebnd_dlc02_path = Path(elden_ring_path, "shader/shaderbdle_dlc02.shaderbdlebnd.dcx")
 
-    shaderbdlebnd = Binder.from_path(shaderbdlebnd_path)
-    shaderbdlebnd_dlc01 = Binder.from_path(shaderbdlebnd_dlc01_path)
-    shaderbdlebnd_dlc02 = Binder.from_path(shaderbdlebnd_dlc02_path)
+def load_shaderbdle_binder(game_root: Path) -> Binder:
+    """Load and merge base + DLC shaderbdle binders from a game install."""
+    shaderbdle_paths = [
+        game_root / "shader/shaderbdle.shaderbdlebnd.dcx",
+        game_root / "shader/shaderbdle_dlc01.shaderbdlebnd.dcx",
+        game_root / "shader/shaderbdle_dlc02.shaderbdlebnd.dcx",
+    ]
+    existing_paths = [path for path in shaderbdle_paths if path.is_file()]
+    if not existing_paths:
+        raise FileNotFoundError(f"No shaderbdle binders found under {game_root / 'shader'}")
 
+    shaderbdlebnd = Binder.from_path(existing_paths[0])
     entries_by_name = shaderbdlebnd.get_entries_by_name()
-    for entry in shaderbdlebnd_dlc01.entries:
-        if entry.name in entries_by_name:
-            # Replace base game entry with DLC entry.
-            shaderbdlebnd.remove_entry_name(entry.name)
-        shaderbdlebnd.entries.append(entry)
-    for entry in shaderbdlebnd_dlc02.entries:
-        if entry.name in entries_by_name:
-            # Replace base game entry with DLC entry.
-            shaderbdlebnd.remove_entry_name(entry.name)
-        shaderbdlebnd.entries.append(entry)
+    for path in existing_paths[1:]:
+        for entry in Binder.from_path(path).entries:
+            if entry.name in entries_by_name:
+                shaderbdlebnd.remove_entry_name(entry.name)
+            shaderbdlebnd.entries.append(entry)
+            entries_by_name[entry.name] = entry
+    return shaderbdlebnd
 
-    # Full mapping of 'group_X' to `{full_sampler_name, default_texture_stem}`.
-    # Includes ungrouped samplers.
-    all_shader_sampler_groups = {}
 
-    # Summarized mapping of group 'X' to `[short_sampler_name_1, short_sampler_name_2, ...]`.
-    # The short sampler names have the shader stem prefix removed (converting '[' to '_'), then
-    # also have '_snp_Texture_2D_' removed if still present.
-    # We also include the default texture name if present and does not contain 'SYSTEX'.
-    shader_group_summaries = {}
+def load_game_matbinbnds(game_root: Path) -> list[MATBINBND]:
+    """Load MATBINBND binders from a game install's material directory."""
+    matbinbnd_paths = [
+        game_root / "material/allmaterial.matbinbnd.dcx",
+        game_root / "material/allmaterial_dlc01.matbinbnd.dcx",
+    ]
+    matbinbnds = []
+    for path in matbinbnd_paths:
+        if path.is_file():
+            matbinbnds.append(MATBINBND.from_path(path))
+    if not matbinbnds:
+        raise FileNotFoundError(f"No MATBINBND files found under {game_root / 'material'}")
+    return matbinbnds
 
-    for matbin_entry in matbinbnd.entries:
-        matbin = MATBIN.from_binder_entry(matbin_entry)
-        shader_stem = matbin.shader_name.split(".")[0]
+
+def iter_matbins(matbinbnds: list[MATBINBND]):
+    """Yield unique MATBIN entries by shader stem across multiple MATBINBND binders."""
+    seen_shader_stems: set[str] = set()
+    for matbinbnd in matbinbnds:
+        for matbin_entry in matbinbnd.entries:
+            matbin = MATBIN.from_binder_entry(matbin_entry)
+            shader_stem = matbin.shader_stem
+            if shader_stem in seen_shader_stems:
+                continue
+            seen_shader_stems.add(shader_stem)
+            yield matbin
+
+
+def collect_shader_sampler_groups(
+    matbinbnd: MATBINBND | list[MATBINBND],
+    shaderbdlebnd: Binder,
+) -> tuple[dict[str, dict[str, list[tuple[str, str]]]], dict[str, dict[str, list[str]]]]:
+    """Collect sampler groups and summaries for all shaders referenced by MATBIN entries."""
+    if isinstance(matbinbnd, list):
+        matbins = list(iter_matbins(matbinbnd))
+    else:
+        matbins = [MATBIN.from_binder_entry(entry) for entry in matbinbnd.entries]
+
+    all_shader_sampler_groups: dict[str, dict[str, list[tuple[str, str]]]] = {}
+    shader_group_summaries: dict[str, dict[str, list[str]]] = {}
+
+    for matbin in matbins:
+        shader_stem = matbin.shader_stem
         if shader_stem in all_shader_sampler_groups:
-            continue  # done from previous MATBIN
+            continue
 
         print(f"Finding metaparam for shader {shader_stem}...")
-        # NOTE: Every shader has its own shaderbdle entry, so there's nothing to cache.
         try:
             shaderbdle_entry = shaderbdlebnd.find_entry_by_name(f"{shader_stem}.shaderbdle")
         except EntryNotFoundError:
             print(f"  No shaderbdle entry found for {shader_stem}.")
-            all_shader_sampler_groups[shader_stem] = []  # don't look again
             continue
 
         shaderbdle = Binder.from_binder_entry(shaderbdle_entry)
         metaparam_entry = shaderbdle.find_entry_by_name(f"{shader_stem}.metaparam")
+        try:
+            shader_sampler_groups = read_metaparam(metaparam_entry)
+        except (ValueError, EntryNotFoundError) as ex:
+            print(f"  Failed to read metaparam for {shader_stem}: {ex}")
+            continue
+        if not shader_sampler_groups:
+            continue
 
-        shader_sampler_groups = read_metaparam(metaparam_entry)
-        # Sort group keys by group index (if present).
         shader_sampler_groups = {
             group_name: shader_sampler_groups[group_name]
             for group_name in sorted(
@@ -73,10 +111,6 @@ def generate_metaparam(elden_ring_path: Path):
         }
         all_shader_sampler_groups[shader_stem] = shader_sampler_groups
 
-        if not shader_sampler_groups:
-            continue  # no summary
-
-        # Write summary content.
         shader_group_summaries[shader_stem] = {}
         shader_prefix = shader_stem.replace("][", "_").replace("[", "_").replace("]", "_")
         for group_name, samplers in shader_sampler_groups.items():
@@ -89,16 +123,49 @@ def generate_metaparam(elden_ring_path: Path):
                 short_sampler_names.append(short_name)
             shader_group_summaries[shader_stem][group_name] = short_sampler_names
 
-    # Sort by shader name.
-    all_shader_sampler_groups = {
-        k: v for k, v in sorted(all_shader_sampler_groups.items())
+    all_shader_sampler_groups = dict(sorted(all_shader_sampler_groups.items()))
+    shader_group_summaries = dict(sorted(shader_group_summaries.items()))
+    return all_shader_sampler_groups, shader_group_summaries
+
+
+def generate_metaparam(game_root: Path):
+    """Regenerate the full ER shader sampler groups JSON from bundled ER MATBINBND + game shaderbdle."""
+    matbinbnd = MATBINBND.from_bundled("ELDEN_RING")
+    shaderbdlebnd = load_shaderbdle_binder(game_root)
+    all_shader_sampler_groups, shader_group_summaries = collect_shader_sampler_groups(matbinbnd, shaderbdlebnd)
+
+    write_json(ER_SHADER_SAMPLER_GROUPS_PATH, all_shader_sampler_groups, indent=4)
+    write_json(RESOURCES_DIR / "er_shader_sampler_groups_summary.json", shader_group_summaries, indent=4)
+
+
+def generate_nr_overlay(game_root: Path):
+    """Generate NR-only shader sampler groups not already present in the ER JSON."""
+    er_shader_sampler_groups = read_json(ER_SHADER_SAMPLER_GROUPS_PATH)
+    matbinbnds = load_game_matbinbnds(game_root)
+    shaderbdlebnd = load_shaderbdle_binder(game_root)
+    all_shader_sampler_groups, shader_group_summaries = collect_shader_sampler_groups(matbinbnds, shaderbdlebnd)
+
+    scanned = len(all_shader_sampler_groups)
+    nr_shader_sampler_groups = {
+        shader_stem: sampler_groups
+        for shader_stem, sampler_groups in all_shader_sampler_groups.items()
+        if shader_stem not in er_shader_sampler_groups
     }
-    shader_group_summaries = {
-        k: v for k, v in sorted(shader_group_summaries.items())
+    skipped_existing = scanned - len(nr_shader_sampler_groups)
+
+    nr_shader_group_summaries = {
+        shader_stem: shader_group_summaries[shader_stem]
+        for shader_stem in nr_shader_sampler_groups
     }
 
-    write_json("resources/er_shader_sampler_groups.json", all_shader_sampler_groups, indent=4)
-    write_json("resources/er_shader_sampler_groups_summary.json", shader_group_summaries, indent=4)
+    write_json(NR_SHADER_SAMPLER_GROUPS_PATH, nr_shader_sampler_groups, indent=4)
+    write_json(RESOURCES_DIR / "nr_shader_sampler_groups_summary.json", nr_shader_group_summaries, indent=4)
+
+    print(
+        f"NR overlay: scanned {scanned} unique shaders, "
+        f"added {len(nr_shader_sampler_groups)} new entries, "
+        f"skipped {skipped_existing} already in ER JSON."
+    )
 
 
 def read_metaparam(metaparam_entry: BinderEntry) -> dict[str, list[tuple[str, str]]]:
@@ -128,5 +195,26 @@ def read_metaparam(metaparam_entry: BinderEntry) -> dict[str, list[tuple[str, st
     return shader_dict
 
 
-if __name__ == '__main__':
-    generate_metaparam(ELDEN_RING_PATH)
+def main():
+    parser = argparse.ArgumentParser(description="Generate Elden Ring / Nightreign shader sampler group JSON.")
+    parser.add_argument(
+        "--game-root",
+        type=Path,
+        default=ELDEN_RING_PATH,
+        help="Path to the game 'Game' directory containing shader/ and material/ folders.",
+    )
+    parser.add_argument(
+        "--nr-overlay",
+        action="store_true",
+        help="Write NR-only shader entries to nr_shader_sampler_groups.json (does not modify ER JSON).",
+    )
+    args = parser.parse_args()
+
+    if args.nr_overlay:
+        generate_nr_overlay(args.game_root)
+    else:
+        generate_metaparam(args.game_root)
+
+
+if __name__ == "__main__":
+    main()

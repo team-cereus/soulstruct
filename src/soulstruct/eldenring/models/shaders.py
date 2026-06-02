@@ -1072,6 +1072,17 @@ def _fallback_uv_for_role(role: SamplerGroupRole, profile: ShaderProfile) -> str
 
 # endregion
 
+_ER_SHADER_SAMPLER_GROUPS = read_json(
+    SOULSTRUCT_PATH("eldenring/models/resources/er_shader_sampler_groups.json")
+)
+_NR_SHADER_SAMPLER_GROUPS = read_json(
+    SOULSTRUCT_PATH("eldenring/models/resources/nr_shader_sampler_groups.json")
+)
+_MERGED_SHADER_SAMPLER_GROUPS = {
+    **_ER_SHADER_SAMPLER_GROUPS,
+    **{k: v for k, v in _NR_SHADER_SAMPLER_GROUPS.items() if k not in _ER_SHADER_SAMPLER_GROUPS},
+}
+
 
 @dataclass(slots=True, repr=False)
 class MatDef(_BaseMatDef):
@@ -1091,9 +1102,7 @@ class MatDef(_BaseMatDef):
         UVEye2D = auto()
         UVEye4D = auto()
 
-    METAPARAMS: tp.ClassVar[dict[str, dict[str, list[tuple[str, str]]]]] = read_json(
-        SOULSTRUCT_PATH("eldenring/models/resources/er_shader_sampler_groups.json")
-    )
+    METAPARAMS: tp.ClassVar[dict[str, dict[str, list[tuple[str, str]]]]] = _MERGED_SHADER_SAMPLER_GROUPS
 
     NAME_TAG_RE: tp.ClassVar[dict[str, re.Pattern]] = {
         "Multi": re.compile(r".*\[Mb(\d+).*\].*"),
@@ -1115,14 +1124,35 @@ class MatDef(_BaseMatDef):
     fur: bool = False
 
     @classmethod
-    def from_matbin(cls, matbin: MATBIN) -> tp.Self:
-        """Extract material definition from a MATBIN using shader metaparam JSON and explicit UV slot dictionaries."""
-        metaparam = cls.METAPARAMS.get(matbin.shader_stem, None)
-        if not metaparam:
+    def _resolve_metaparam(cls, matbin: MATBIN) -> dict[str, list[tuple[str, str]]]:
+        """Look up shader metaparam from bundled JSON, with cloth-stem fallback and MATBIN synthesis."""
+        shader_stem = matbin.shader_stem
+        metaparam = cls.METAPARAMS.get(shader_stem)
+        if metaparam:
+            return metaparam
+
+        normalized_stem = _normalize_stem(shader_stem)
+        if normalized_stem != shader_stem:
+            metaparam = cls.METAPARAMS.get(normalized_stem)
+            if metaparam:
+                return metaparam
+
+        if not matbin.samplers:
             raise MatDefError(
                 f"No shader metaparam information known to Soulstruct for Elden Ring shader '{matbin.shader_name}'. "
                 f"Cannot parse material definition, as sampler groups cannot be determined from their names alone."
             )
+
+        _LOGGER.warning(
+            "No bundled metaparam for Elden Ring shader '%s'. Synthesizing sampler groups from MATBIN samplers.",
+            matbin.shader_name,
+        )
+        return {"": [(sampler.sampler_type, sampler.path) for sampler in matbin.samplers]}
+
+    @classmethod
+    def from_matbin(cls, matbin: MATBIN) -> tp.Self:
+        """Extract material definition from a MATBIN using shader metaparam JSON and explicit UV slot dictionaries."""
+        metaparam = cls._resolve_metaparam(matbin)
 
         matbin_name = matbin.path.name if matbin.path is not None else ""
         profile = ShaderProfile.from_shader_stem(matbin.shader_stem)

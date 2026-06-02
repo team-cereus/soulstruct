@@ -1,0 +1,3903 @@
+{
+    "CS[AEG593_400]_Mercury": {
+        "group_1": [
+            "5_AlbedoMap",
+            "6_MetallicMap",
+            "7_NormalMap"
+        ],
+        "group_3": [
+            "1_AlbedoMap",
+            "2__DistortionDepth"
+        ]
+    },
+    "CS[Reminiscence_filter][CL]_02": {
+        "group_7": [
+            "1_AlbedoMap_0"
+        ],
+        "group_8": [
+            "2_Mask3Map"
+        ]
+    },
+    "CS[Reminiscence_filter][CL]_03": {
+        "group_7": [
+            "1_AlbedoMap_0"
+        ],
+        "group_8": [
+            "2_Mask3Map"
+        ]
+    },
+    "CS[Reminiscence_filter][CL]_04": {
+        "group_7": [
+            "1_AlbedoMap_0"
+        ],
+        "group_8": [
+            "2_Mask3Map"
+        ]
+    },
+    "CS[Reminiscence_filter][CL]_05": {
+        "group_7": [
+            "1_AlbedoMap_0"
+        ],
+        "group_8": [
+            "2_Mask3Map"
+        ],
+        "group_9": [
+            "0_AlbedoMap",
+            "3_AlbedoMap"
+        ]
+    },
+    "CS[Reminiscence_filter][CL]_06": {
+        "group_7": [
+            "1_AlbedoMap_0"
+        ],
+        "group_8": [
+            "2_Mask3Map"
+        ]
+    },
+    "CS[Rune][CL]_Base_01": {
+        "group_5": [
+            "1_Mask3Map_0",
+            "3_AlbedoMap_0",
+            "8_Mask3Map_0",
+            "9_AlbedoMap_0",
+            "6_EmissiveMap_0"
+        ],
+        "group_9": [
+            "2_Mask3Map",
+            "7_Mask3Map"
+        ]
+    },
+    "C[AMSN][VA_Frame]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_4",
+            "3_MetallicMap_0"
+        ],
+        "group_2": [
+            "0_VectorMap",
+            "4_NormalMap"
+        ]
+    },
+    "C[AMSN]_AlphaOpacity[Rich]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_MetallicMap_0",
+            "7_NormalMap_4"
+        ]
+    },
+    "C[AMSN]_AlphaOpacity[Rich]_cloth": {
+        "group_1": [
+            "C_AMSN__AlphaOpacity_Rich__snp_Texture2D_2_AlbedoMap_0",
+            "C_AMSN__AlphaOpacity_Rich__snp_Texture2D_0_MetallicMap_0",
+            "C_AMSN__AlphaOpacity_Rich__snp_Texture2D_7_NormalMap_4"
+        ]
+    },
+    "C[AMSN]_ContactFade_Glow[MaskScroll]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_MetallicMap_0",
+            "1_EmissiveMap",
+            "7_NormalMap_4"
+        ],
+        "group_3": [
+            "3_Mask1Map == AAT100_Crystal_g"
+        ]
+    },
+    "C[AMSN]_Glow[MaskScroll]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_MetallicMap_0",
+            "1_EmissiveMap",
+            "7_NormalMap_4"
+        ],
+        "group_2": [
+            "3_Mask1Map == AAT100_Crystal_g"
+        ]
+    },
+    "C[AMSN]_ch2Exp": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_MetallicMap_0",
+            "7_NormalMap_4"
+        ]
+    },
+    "C[Crystal]_Tr_cloth": {
+        "group_1": [
+            "C_Crystal__Tr_snp_Texture2D_5_AlbedoMap",
+            "C_Crystal__Tr_snp_Texture2D_0_Mask1Map",
+            "C_Crystal__Tr_snp_Texture2D_6_MetallicMap",
+            "C_Crystal__Tr_snp_Texture2D_7_NormalMap"
+        ],
+        "group_3": [
+            "C_Crystal__Tr_snp_Texture2D_1_AlbedoMap",
+            "C_Crystal__Tr_snp_Texture2D_2__DistortionDepth"
+        ],
+        "group_4": [
+            "C_Crystal__Tr_snp_Texture2D_3_Mask1Map"
+        ]
+    },
+    "C[Cutscene][AMSN][VA_Frame]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_MetallicMap_0",
+            "7_NormalMap_4"
+        ],
+        "group_3": [
+            "1_NormalMap",
+            "3_VectorMap"
+        ]
+    },
+    "C[Cutscene][Hair][ChrCustomize][VA_Frame]": {
+        "group_1": [
+            "0_NormalMap",
+            "3_Mask1Map_1",
+            "4_Mask3Map"
+        ],
+        "group_9": [
+            "1_NormalMap",
+            "2_VectorMap"
+        ]
+    },
+    "C[DetailBlend][1_0_0_0]_Glow[Int]": {
+        "group_1": [
+            "7_AlbedoMap",
+            "0_NormalMap",
+            "2_EmissiveMap",
+            "3_MetallicMap"
+        ],
+        "group_2": [
+            "1_AlbedoMap",
+            "6_NormalMap"
+        ]
+    },
+    "C[DetailBlend][1_0_0_0]_Glow[MaskScroll]": {
+        "group_1": [
+            "7_AlbedoMap",
+            "0_NormalMap",
+            "2_EmissiveMap",
+            "3_MetallicMap"
+        ],
+        "group_2": [
+            "1_AlbedoMap",
+            "6_NormalMap"
+        ],
+        "group_7": [
+            "4_Mask1Map == AAT100_Crystal_g"
+        ]
+    },
+    "C[DetailBlend][1_0_0_0]_Glow[MaskScroll]2": {
+        "group_1": [
+            "7_AlbedoMap",
+            "0_NormalMap",
+            "2_EmissiveMap",
+            "3_MetallicMap"
+        ],
+        "group_2": [
+            "1_AlbedoMap",
+            "6_NormalMap"
+        ],
+        "group_7": [
+            "4_Mask1Map == AAT100_Crystal_g"
+        ]
+    },
+    "C[DetailBlend][1_0_0_0]_Glow[MaskScroll]2_cloth": {
+        "group_1": [
+            "C_DetailBlend_1_0_0_0__Glow_MaskScroll_2_snp_Texture2D_7_AlbedoMap",
+            "C_DetailBlend_1_0_0_0__Glow_MaskScroll_2_snp_Texture2D_0_NormalMap",
+            "C_DetailBlend_1_0_0_0__Glow_MaskScroll_2_snp_Texture2D_2_EmissiveMap",
+            "C_DetailBlend_1_0_0_0__Glow_MaskScroll_2_snp_Texture2D_3_MetallicMap"
+        ],
+        "group_2": [
+            "C_DetailBlend_1_0_0_0__Glow_MaskScroll_2_snp_Texture2D_1_AlbedoMap",
+            "C_DetailBlend_1_0_0_0__Glow_MaskScroll_2_snp_Texture2D_6_NormalMap"
+        ],
+        "group_7": [
+            "C_DetailBlend_1_0_0_0__Glow_MaskScroll_2_snp_Texture2D_4_Mask1Map == AAT100_Crystal_g"
+        ]
+    },
+    "C[DetailBlend][1_0_0_0]_Glow[MaskScroll]_Fade": {
+        "group_1": [
+            "7_AlbedoMap",
+            "0_NormalMap",
+            "2_EmissiveMap",
+            "3_MetallicMap"
+        ],
+        "group_2": [
+            "1_AlbedoMap",
+            "6_NormalMap"
+        ],
+        "group_7": [
+            "4_Mask1Map == AAT100_Crystal_g"
+        ],
+        "group_8": [
+            "5__Fade__Line"
+        ]
+    },
+    "C[Fur]_Glow[MaskScroll]": {
+        "group_1": [
+            "1_AlbedoMap",
+            "6_NormalMap"
+        ],
+        "group_2": [
+            "0_NormalMap",
+            "3_MetallicMap",
+            "8_AlbedoMap"
+        ],
+        "group_5": [
+            "10_EmissiveMap",
+            "7_Mask1Map == AAT100_Crystal_g",
+            "9_EmissiveMap"
+        ]
+    },
+    "C[c0010][AMSN]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_MetallicMap_0",
+            "7_NormalMap_4"
+        ]
+    },
+    "C[c4491]_GestureBoard": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_NormalMap_4",
+            "3_EmissiveMap",
+            "4_MetallicMap_0"
+        ]
+    },
+    "C[c4901]_Freeze_AO": {
+        "group_1": [
+            "8_AlbedoMap",
+            "1_NormalMap",
+            "3_MetallicMap"
+        ],
+        "group_2": [
+            "5_NormalMap"
+        ],
+        "group_3": [
+            "10_AlbedoMap",
+            "9__DistortionDepth"
+        ],
+        "group_5": [
+            "13_NormalMap",
+            "7_AlbedoMap"
+        ],
+        "group_6": [
+            "12_Mask3Map"
+        ],
+        "group_8": [
+            "0_Mask1Map"
+        ]
+    },
+    "C[c4901]_Freeze_AO_ch2": {
+        "group_1": [
+            "8_AlbedoMap",
+            "1_NormalMap",
+            "3_MetallicMap"
+        ],
+        "group_2": [
+            "5_NormalMap"
+        ],
+        "group_3": [
+            "10_AlbedoMap",
+            "9__DistortionDepth"
+        ],
+        "group_5": [
+            "13_NormalMap",
+            "7_AlbedoMap"
+        ],
+        "group_6": [
+            "12_Mask3Map"
+        ],
+        "group_8": [
+            "0_Mask1Map"
+        ]
+    },
+    "C[c4901]_Freeze_ContactFade_AO": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_MetallicMap_0",
+            "7_NormalMap_4"
+        ],
+        "group_2": [
+            "1__Albedo__Inside",
+            "3__DistortionDepth"
+        ],
+        "group_7": [
+            "6_Mask1Map"
+        ]
+    },
+    "C[c4901]_Freeze_ContactFade_AO_ch2": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_MetallicMap_0",
+            "7_NormalMap_4"
+        ],
+        "group_2": [
+            "1__Albedo__Inside",
+            "3__DistortionDepth"
+        ],
+        "group_7": [
+            "6_Mask1Map"
+        ]
+    },
+    "C[c4901]_[Crystal]_Tr_AO": {
+        "group_1": [
+            "5_AlbedoMap",
+            "0_Mask1Map",
+            "6_MetallicMap",
+            "7_NormalMap"
+        ],
+        "group_3": [
+            "1_AlbedoMap",
+            "2__DistortionDepth"
+        ],
+        "group_4": [
+            "3_Mask1Map"
+        ],
+        "group_5": [
+            "4_Mask1Map"
+        ]
+    },
+    "C[c4901]_[Crystal]_Tr_AO_ch2": {
+        "group_1": [
+            "5_AlbedoMap",
+            "0_Mask1Map",
+            "6_MetallicMap",
+            "7_NormalMap"
+        ],
+        "group_3": [
+            "1_AlbedoMap",
+            "2__DistortionDepth"
+        ],
+        "group_4": [
+            "3_Mask1Map"
+        ],
+        "group_5": [
+            "4_Mask1Map"
+        ]
+    },
+    "C[c4901]_[Crystal_NoTransparent]_Glow": {
+        "group_1": [
+            "5_AlbedoMap",
+            "6_MetallicMap",
+            "7_NormalMap"
+        ],
+        "group_3": [
+            "1_AlbedoMap",
+            "2__DistortionDepth"
+        ]
+    },
+    "C[c5010][AMSN]_Arts": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_MetallicMap_0",
+            "7_NormalMap_4"
+        ],
+        "group_2": [
+            "4_Mask1Map_0",
+            "6_EmissiveMap_0"
+        ]
+    },
+    "C[c7500]_LastBoss_FireMask": {
+        "group_1": [
+            "0_MetallicMap_0",
+            "1_EmissiveMap",
+            "2_AlbedoMap_0",
+            "7_NormalMap_4"
+        ],
+        "group_2": [
+            "3_Mask1Map == AAT100_Crystal_g"
+        ]
+    },
+    "C[c7500]_LastBoss_FireMask_cloth": {
+        "group_1": [
+            "C_c7500__LastBoss_FireMask_snp_Texture2D_0_MetallicMap_0",
+            "C_c7500__LastBoss_FireMask_snp_Texture2D_1_EmissiveMap",
+            "C_c7500__LastBoss_FireMask_snp_Texture2D_2_AlbedoMap_0",
+            "C_c7500__LastBoss_FireMask_snp_Texture2D_7_NormalMap_4"
+        ],
+        "group_2": [
+            "C_c7500__LastBoss_FireMask_snp_Texture2D_3_Mask1Map == AAT100_Crystal_g"
+        ]
+    },
+    "C[c7511]_LightningFang": {
+        "group_1": [
+            "4_AlbedoMap"
+        ],
+        "group_2": [
+            "2_Mask1Map"
+        ]
+    },
+    "C[c7520]_Glow": {
+        "group_1": [
+            "1_AlbedoMap"
+        ],
+        "group_5": [
+            "10_EmissiveMap",
+            "7_Mask1Map == AAT100_Crystal_g",
+            "9_EmissiveMap"
+        ],
+        "group_7": [
+            "0_Mask1Map"
+        ]
+    },
+    "C[c7520]_Glow_cloth": {
+        "group_1": [
+            "C_c7520__Glow_snp_Texture2D_1_AlbedoMap"
+        ],
+        "group_5": [
+            "C_c7520__Glow_snp_Texture2D_10_EmissiveMap",
+            "C_c7520__Glow_snp_Texture2D_7_Mask1Map == AAT100_Crystal_g",
+            "C_c7520__Glow_snp_Texture2D_9_EmissiveMap"
+        ],
+        "group_7": [
+            "C_c7520__Glow_snp_Texture2D_0_Mask1Map"
+        ]
+    },
+    "C[c7521]_FireWing_Flipbook": {
+        "group_1": [
+            "1_Mask3Map",
+            "7_AlbedoMap"
+        ],
+        "group_3": [
+            "3_VectorMap",
+            "9_Mask1Map"
+        ],
+        "group_4": [
+            "0_VectorMap",
+            "8_Mask1Map"
+        ],
+        "group_7": [
+            "5_Mask1Map"
+        ],
+        "group_8": [
+            "2_Mask1Map",
+            "6_Mask1Map"
+        ]
+    },
+    "C[c7521]_FireWing_Flipbook_cloth": {
+        "group_1": [
+            "C_c7521__FireWing_Flipbook_snp_Texture2D_1_Mask3Map",
+            "C_c7521__FireWing_Flipbook_snp_Texture2D_7_AlbedoMap"
+        ],
+        "group_3": [
+            "C_c7521__FireWing_Flipbook_snp_Texture2D_3_VectorMap",
+            "C_c7521__FireWing_Flipbook_snp_Texture2D_9_Mask1Map"
+        ],
+        "group_4": [
+            "C_c7521__FireWing_Flipbook_snp_Texture2D_0_VectorMap",
+            "C_c7521__FireWing_Flipbook_snp_Texture2D_8_Mask1Map"
+        ],
+        "group_7": [
+            "C_c7521__FireWing_Flipbook_snp_Texture2D_5_Mask1Map"
+        ],
+        "group_8": [
+            "C_c7521__FireWing_Flipbook_snp_Texture2D_2_Mask1Map",
+            "C_c7521__FireWing_Flipbook_snp_Texture2D_6_Mask1Map"
+        ]
+    },
+    "C[c7540]_Body2": {
+        "group_2": [
+            "1__Emissive__Base",
+            "5__Emissive__BaseDetail"
+        ],
+        "group_3": [
+            "3__Emissive__Base_2 == AAT100_Crystal_g"
+        ],
+        "group_5": [
+            "8_Mask1Map_0"
+        ]
+    },
+    "C[c7540]_Body2_LB": {
+        "group_2": [
+            "1__Emissive__Base",
+            "5__Emissive__BaseDetail"
+        ],
+        "group_3": [
+            "3__Emissive__Base_2 == AAT100_Crystal_g"
+        ]
+    },
+    "C[c7540]_Body2_LB_cloth": {
+        "group_2": [
+            "C_c7540__Body2_LB_snp_Texture2D_1__Emissive__Base",
+            "C_c7540__Body2_LB_snp_Texture2D_5__Emissive__BaseDetail"
+        ],
+        "group_3": [
+            "C_c7540__Body2_LB_snp_Texture2D_3__Emissive__Base_2 == AAT100_Crystal_g"
+        ]
+    },
+    "C[c7540]_Core": {
+        "group_2": [
+            "4_EmissiveMap"
+        ],
+        "group_3": [
+            "5__Mask__BlendEdgeTexture == AAT100_Crystal_g"
+        ]
+    },
+    "C[c7540]_Wave": {
+        "group_2": [
+            "1__Emissive__Base"
+        ],
+        "group_3": [
+            "3__Emissive__Base_2 == AAT100_Crystal_g"
+        ],
+        "group_4": [
+            "4__Mask__BlendEdgeTexture == AAT100_Crystal_g"
+        ]
+    },
+    "C[c7541]_Funnel": {
+        "group_2": [
+            "1__Emissive__Base"
+        ],
+        "group_3": [
+            "3__Emissive__Base_2 == AAT100_Crystal_g"
+        ],
+        "group_4": [
+            "4__Mask__BlendEdgeTexture == AAT100_Crystal_g"
+        ]
+    },
+    "C[c7580]_Bandage": {
+        "group_1": [
+            "1_AlbedoMap",
+            "3_MetallicMap",
+            "6_NormalMap",
+            "7_EmissiveMap"
+        ],
+        "group_2": [
+            "8_AlbedoMap",
+            "9_Mask1Map_0"
+        ]
+    },
+    "C[c7580]_Bandage_cloth": {
+        "group_1": [
+            "C_c7580__Bandage_snp_Texture2D_1_AlbedoMap",
+            "C_c7580__Bandage_snp_Texture2D_3_MetallicMap",
+            "C_c7580__Bandage_snp_Texture2D_6_NormalMap",
+            "C_c7580__Bandage_snp_Texture2D_7_EmissiveMap"
+        ],
+        "group_2": [
+            "C_c7580__Bandage_snp_Texture2D_8_AlbedoMap",
+            "C_c7580__Bandage_snp_Texture2D_9_Mask1Map_0"
+        ]
+    },
+    "C[c7600]_Awake_Body": {
+        "group_1": [
+            "14_AlbedoMap",
+            "7_AlbedoMap",
+            "0_NormalMap",
+            "15_MetallicMap",
+            "16_NormalMap",
+            "3_MetallicMap"
+        ],
+        "group_2": [
+            "1_AlbedoMap",
+            "6_NormalMap"
+        ],
+        "group_4": [
+            "10_AlbedoMap",
+            "12_NormalMap"
+        ],
+        "group_7": [
+            "4_AlbedoMap",
+            "9_NormalMap"
+        ],
+        "group_9": [
+            "5_AlbedoMap"
+        ],
+        "group_10": [
+            "2_AlbedoMap"
+        ]
+    },
+    "C[c7600]_Awake_Fur": {
+        "group_1": [
+            "1_AlbedoMap",
+            "5_DisplacementMap",
+            "6_NormalMap"
+        ],
+        "group_2": [
+            "0_NormalMap",
+            "3_MetallicMap",
+            "7_AlbedoMap",
+            "8_AlbedoMap"
+        ],
+        "group_5": [
+            "9_AlbedoMap"
+        ],
+        "group_6": [
+            "10_AlbedoMap"
+        ]
+    },
+    "C[c7600]_Body": {
+        "group_1": [
+            "14_AlbedoMap",
+            "7_AlbedoMap",
+            "0_NormalMap",
+            "15_MetallicMap",
+            "16_NormalMap",
+            "3_MetallicMap"
+        ],
+        "group_2": [
+            "1_AlbedoMap",
+            "6_NormalMap"
+        ],
+        "group_4": [
+            "10_AlbedoMap",
+            "12_NormalMap"
+        ],
+        "group_7": [
+            "4_AlbedoMap",
+            "9_NormalMap"
+        ]
+    },
+    "C[c7600]_Fur": {
+        "group_1": [
+            "1_AlbedoMap",
+            "5_DisplacementMap",
+            "6_NormalMap"
+        ],
+        "group_2": [
+            "0_NormalMap",
+            "3_MetallicMap",
+            "7_AlbedoMap",
+            "8_AlbedoMap"
+        ]
+    },
+    "C[c7600]_Fur_cloth": {
+        "group_1": [
+            "C_c7600__Fur_snp_Texture2D_1_AlbedoMap",
+            "C_c7600__Fur_snp_Texture2D_5_DisplacementMap",
+            "C_c7600__Fur_snp_Texture2D_6_NormalMap"
+        ],
+        "group_2": [
+            "C_c7600__Fur_snp_Texture2D_0_NormalMap",
+            "C_c7600__Fur_snp_Texture2D_3_MetallicMap",
+            "C_c7600__Fur_snp_Texture2D_7_AlbedoMap",
+            "C_c7600__Fur_snp_Texture2D_8_AlbedoMap"
+        ]
+    },
+    "C[c7600]_Weapon": {
+        "group_1": [
+            "14_AlbedoMap",
+            "7_AlbedoMap",
+            "0_NormalMap",
+            "15_MetallicMap",
+            "16_NormalMap",
+            "3_MetallicMap"
+        ],
+        "group_2": [
+            "1_AlbedoMap",
+            "6_NormalMap"
+        ],
+        "group_4": [
+            "10_AlbedoMap",
+            "12_NormalMap"
+        ],
+        "group_7": [
+            "4_AlbedoMap",
+            "9_NormalMap"
+        ],
+        "group_9": [
+            "5_AlbedoMap"
+        ],
+        "group_10": [
+            "2_AlbedoMap"
+        ]
+    },
+    "C[c7620]_Wing_Glow": {
+        "group_1": [
+            "5_AlbedoMap",
+            "4_EmissiveMap",
+            "6_MetallicMap",
+            "7_NormalMap"
+        ],
+        "group_3": [
+            "1_AlbedoMap",
+            "2__DistortionDepth"
+        ],
+        "group_4": [
+            "3_Mask1Map"
+        ],
+        "group_5": [
+            "9_Mask1Map"
+        ],
+        "group_7": [
+            "8_AlbedoMap"
+        ],
+        "group_8": [
+            "11_AlbedoMap",
+            "12_AlbedoMap"
+        ],
+        "group_9": [
+            "14_AlbedoMap",
+            "15_AlbedoMap"
+        ]
+    },
+    "C[c7920]_Veill_NoLight": {
+        "group_2": [
+            "1_NormalMap_0 == m30_ground_06_n",
+            "3_MaskTexture == mask"
+        ]
+    },
+    "C[c7920]_Veill_NoLight_cloth": {
+        "group_2": [
+            "C_c7920__Veill_NoLight_snp_Texture2D_1_NormalMap_0 == m30_ground_06_n",
+            "C_c7920__Veill_NoLight_snp_Texture2D_3_MaskTexture == mask"
+        ]
+    },
+    "C_AEG[300_100]_Body": {
+        "group_2": [
+            "1__Emissive__Base",
+            "5__Emissive__BaseDetail"
+        ],
+        "group_3": [
+            "3__Emissive__Base_2 == AAT100_Crystal_g"
+        ]
+    },
+    "C_AEG[594_010]_Giant_Body": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "7_NormalMap_4"
+        ],
+        "group_2": [
+            "4_AmbientOcculusionMap"
+        ],
+        "group_3": [
+            "1_NormalMap",
+            "3_AlbedoMap"
+        ],
+        "group_4": [
+            "5_Mask1Map"
+        ]
+    },
+    "C_AEG[594_010]_Giant_Smoke": {
+        "group_1": [
+            "11_AlbedoMap",
+            "2_NormalMap_4"
+        ],
+        "group_3": [
+            "3_VectorMap",
+            "9_Mask1Map",
+            "1_Mask1Map"
+        ],
+        "group_5": [
+            "0_VectorMap_4"
+        ],
+        "group_6": [
+            "12_AlbedoMap",
+            "4_Mask1Map"
+        ]
+    },
+    "C_AEG[594_010]_Giant_Smoke_Plane": {
+        "group_1": [
+            "11_AlbedoMap",
+            "2_NormalMap_4"
+        ],
+        "group_3": [
+            "4_Mask1Map",
+            "5_VectorMap",
+            "1_AlbedoMap"
+        ],
+        "group_6": [
+            "0_Mask1Map"
+        ]
+    },
+    "C_AEG[594_011]_Giant_Body_[LOD]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "7_NormalMap_4"
+        ],
+        "group_2": [
+            "4_AmbientOcculusionMap"
+        ],
+        "group_3": [
+            "6_VectorMap",
+            "8_NormalMap"
+        ],
+        "group_4": [
+            "5_Mask1Map"
+        ]
+    },
+    "C_AEG[594_011]_Giant_Smoke_Plane_[LOD]": {
+        "group_1": [
+            "11_AlbedoMap",
+            "2_NormalMap_4"
+        ],
+        "group_3": [
+            "4_Mask1Map",
+            "5_VectorMap",
+            "1_AlbedoMap"
+        ],
+        "group_6": [
+            "0_Mask1Map"
+        ],
+        "group_9": [
+            "3_NormalMap",
+            "6_VectorMap"
+        ]
+    },
+    "C_AEG[594_011]_Giant_Smoke_[LOD]": {
+        "group_1": [
+            "11_AlbedoMap",
+            "2_NormalMap_4"
+        ],
+        "group_3": [
+            "3_VectorMap",
+            "9_Mask1Map",
+            "1_Mask1Map"
+        ],
+        "group_5": [
+            "0_VectorMap_4"
+        ],
+        "group_6": [
+            "12_AlbedoMap",
+            "4_Mask1Map"
+        ],
+        "group_8": [
+            "5_NormalMap",
+            "6_VectorMap"
+        ]
+    },
+    "C_Ov[AMSN]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_MetallicMap_0",
+            "7_NormalMap_4"
+        ]
+    },
+    "C_Ov[AddColor][Ch3]": {
+        "group_1": [
+            "1_Mask1Map"
+        ]
+    },
+    "C_Ov[AddColor][Ch3]_EnableUV[2]": {
+        "group_1": [
+            "1_Mask1Map"
+        ]
+    },
+    "C_Ov[Phantom][NoLight][MaskScroll]": {
+        "group_3": [
+            "3_Mask1Map == AAT100_Crystal_g"
+        ]
+    },
+    "C_Ov[c4901]_Crystal": {
+        "group_1": [
+            "4_NormalMap",
+            "8_AlbedoMap"
+        ],
+        "group_3": [
+            "7_Mask1Map"
+        ],
+        "group_4": [
+            "10_AlbedoMap",
+            "9__DistortionDepth"
+        ]
+    },
+    "C_Ov[c7500]_Burn": {
+        "group_3": [
+            "0_AlbedoMap == AAT100_Crystal_g",
+            "1_AlbedoMap == AAT810_Night_1m",
+            "3_AlbedoMap == AAT100_Crystal_g"
+        ]
+    },
+    "C_Ov[c7560]_GoldEnchant": {
+        "group_3": [
+            "3_Mask1Map == AAT100_Crystal_g"
+        ],
+        "group_6": [
+            "0_NormalMap_4"
+        ]
+    },
+    "C_Ov[c7620]_Glow": {
+        "group_1": [
+            "3_AlbedoMap"
+        ],
+        "group_4": [
+            "0_Mask1Map",
+            "1_Mask1Map"
+        ]
+    },
+    "C_Ov[c7820]_Emissive": {
+        "group_1": [
+            "0_EmissiveMap"
+        ],
+        "group_2": [
+            "3_Mask1Map == AAT100_Crystal_g",
+            "1_EmissiveMap"
+        ]
+    },
+    "M[3Mask]_NoLight_Alpha_CL": {
+        "group_3": [
+            "0_Mask3Map_0"
+        ]
+    },
+    "M[AMSN][CL]_PixelDepthOffset": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0"
+        ]
+    },
+    "M[AMSN][DitherFade]": {
+        "group_1": [
+            "0__Albedo",
+            "1_MetallicMap_0",
+            "3__Normal_Shininess"
+        ]
+    },
+    "M[AMSN][Mb3]": {
+        "group_1": [
+            "0_NormalMap_1",
+            "2_AlbedoMap_1",
+            "8_MetallicMap_0"
+        ],
+        "group_2": [
+            "1_NormalMap_2",
+            "3_AlbedoMap_2",
+            "7_MetallicMap_0"
+        ],
+        "group_4": [
+            "10_AlbedoMap_3",
+            "11_MetallicMap_0",
+            "9_NormalMap_3"
+        ],
+        "group_6": [
+            "4_Mask1Map_4"
+        ]
+    },
+    "M[AMSN][Mb4]": {
+        "group_1": [
+            "0_NormalMap_1",
+            "2_AlbedoMap_1",
+            "8_MetallicMap_0"
+        ],
+        "group_2": [
+            "1_NormalMap_2",
+            "3_AlbedoMap_2",
+            "7_MetallicMap_0"
+        ],
+        "group_4": [
+            "10_AlbedoMap_3",
+            "11_MetallicMap_0",
+            "9_NormalMap_3"
+        ],
+        "group_5": [
+            "12_AlbedoMap",
+            "13_MetallicMap_0",
+            "14_NormalMap_3"
+        ],
+        "group_6": [
+            "4_Mask1Map_4"
+        ]
+    },
+    "M[AMSN][Mb4][Ov_AN][3Mask]": {
+        "group_1": [
+            "13_AlbedoMap_0",
+            "7_NormalMap_0"
+        ],
+        "group_2": [
+            "1_AlbedoMap_1",
+            "4_MetallicMap_0",
+            "5_NormalMap_1"
+        ],
+        "group_3": [
+            "2_AlbedoMap_2",
+            "6_NormalMap_2",
+            "9_MetallicMap_0"
+        ],
+        "group_4": [
+            "12_MetallicMap_0",
+            "15_NormalMap_3",
+            "8_AlbedoMap_3"
+        ],
+        "group_5": [
+            "10_MetallicMap_0",
+            "11_AlbedoMap_4",
+            "16_NormalMap_4"
+        ],
+        "": [
+            "0_Mask3Map_2",
+            "3_Mask1Map_4"
+        ]
+    },
+    "M[AMSN][Mb4][RuinsWall]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "2_GSBlendMap_AlbedoMap_1",
+            "8_GSBlendMap_MetallicMap_0"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "3_GSBlendMap_AlbedoMap_2",
+            "7_GSBlendMap_MetallicMap_0"
+        ],
+        "group_4": [
+            "10_GSBlendMap_AlbedoMap_3",
+            "11_GSBlendMap_MetallicMap_0",
+            "9_GSBlendMap_NormalMap_3"
+        ],
+        "group_5": [
+            "12_GSBlendMap_AlbedoMap",
+            "13_GSBlendMap_MetallicMap_0",
+            "14_GSBlendMap_NormalMap_3"
+        ],
+        "group_6": [
+            "4_GSBlendMap_Mask1Map_4"
+        ],
+        "group_7": [
+            "16_GSBlendMap_AlbedoMap_0",
+            "5_GSBlendMap_NormalMap_1"
+        ]
+    },
+    "M[AMSN][Ov_N][CL]_PixelDepthOffset": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0"
+        ],
+        "group_6": [
+            "0_NormalMap_0"
+        ]
+    },
+    "M[AMSN][Ov_N][CrossFade][EmissiveScroll]": {
+        "group_1": [
+            "0_GSBlendMap_MetallicMap_0",
+            "1_GSBlendMap_AlbedoMap_0",
+            "2_GSBlendMap_NormalMap_0",
+            "3_GSBlendMap_NormalMap_0"
+        ],
+        "group_4": [
+            "7_GSBlendMap_Mask3Map_4"
+        ]
+    },
+    "M[AMSN][Sway][CLDLC]_PixelDepthOffset": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0"
+        ]
+    },
+    "M[AMSN]_Edge_Emissive": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0",
+            "4_AlbedoMap_0"
+        ]
+    },
+    "M[AMSN]_Emissive_cloth": {
+        "group_1": [
+            "M_AMSN__Emissive_snp_Texture2D_3_AlbedoMap_0",
+            "M_AMSN__Emissive_snp_Texture2D_1_NormalMap_0",
+            "M_AMSN__Emissive_snp_Texture2D_2_MetallicMap_0",
+            "M_AMSN__Emissive_snp_Texture2D_4_EmissiveMap_0"
+        ]
+    },
+    "M[AMSN]_Vesitation_Emissive_Glow": {
+        "group_2": [
+            "0_AlbedoMap",
+            "2_NormalMap",
+            "3_MetallicMap_0"
+        ],
+        "group_5": [
+            "1_EmissiveMap"
+        ]
+    },
+    "M[AMSN_V][3Mask][CL]_Edge_DecalBlend": {
+        "group_1": [
+            "6_Mask3Map_2",
+            "0_AlbedoMap_0",
+            "1_NormalMap_0"
+        ],
+        "": [
+            "3_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][3Mask][Crystal]": {
+        "group_1": [
+            "1_AlbedoMap_0",
+            "5_NormalMap_0",
+            "6_NormalMap_0"
+        ],
+        "group_7": [
+            "0_Mask1Map",
+            "2_AlbedoMap",
+            "3_NormalMap_0",
+            "7_MetallicMap"
+        ],
+        "": [
+            "8_Mask3Map_4"
+        ]
+    },
+    "M[AMSN_V][3Mask][Crystal]_LocalAO": {
+        "group_1": [
+            "1_AlbedoMap_0",
+            "5_NormalMap_0",
+            "6_NormalMap_0"
+        ],
+        "group_7": [
+            "0_Mask1Map",
+            "2_AlbedoMap",
+            "3_NormalMap_0",
+            "7_MetallicMap"
+        ],
+        "": [
+            "8_Mask3Map_4"
+        ]
+    },
+    "M[AMSN_V][3Mask][Ov_N][CL]_Edge_DecalBlend": {
+        "group_1": [
+            "6_Mask3Map_2",
+            "0_AlbedoMap_0",
+            "1_NormalMap_0"
+        ],
+        "": [
+            "3_Mask1Map_4",
+            "2_NormalMap_0"
+        ]
+    },
+    "M[AMSN_V][3Mask][Ov_N][DLC]_Edge_DecalBlend": {
+        "group_1": [
+            "6_Mask3Map_2",
+            "0_AlbedoMap_0",
+            "1_NormalMap_0"
+        ],
+        "": [
+            "3_Mask1Map_4",
+            "2_NormalMap_0"
+        ]
+    },
+    "M[AMSN_V][CL][3Mask][Ov_AN][Snow_VtxMask][PixelDepth]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "2_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "3_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "11_GSBlendMap_NormalMap_0",
+            "10_GSBlendMap_AlbedoMap_0"
+        ],
+        "group_5": [
+            "5_GSBlendMap_AlbedoMap_0",
+            "7_GSBlendMap_NormalMap_0"
+        ],
+        "group_6": [
+            "6_GSBlendMap_NormalMap_2",
+            "8_GSBlendMap_AlbedoMap_2"
+        ],
+        "": [
+            "4_GSBlendMap_Mask1Map_4",
+            "9_GSBlendMap_Mask3Map_2"
+        ]
+    },
+    "M[AMSN_V][CL][Ov_AN][Snow]": {
+        "group_1": [
+            "1_NormalMap_0",
+            "2_AlbedoMap_0"
+        ],
+        "group_2": [
+            "3_NormalMap_0"
+        ],
+        "group_3": [
+            "0_AlbedoMap_0",
+            "4_NormalMap_0"
+        ]
+    },
+    "M[AMSN_V][CL][Ov_N][Ice][Emissive][PixelDepth]": {
+        "group_1": [
+            "5_GSBlendMap_NormalMap_0",
+            "6_GSBlendMap_AlbedoMap"
+        ],
+        "group_3": [
+            "12_GSBlendMap_AlbedoMap"
+        ],
+        "group_5": [
+            "10_GSBlendMap_AlbedoMap",
+            "8_GSBlendMap_NormalMap_0",
+            "9_GSBlendMap_NormalMap_0"
+        ],
+        "": [
+            "4_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][CL][Ov_N][Snow][PixelDephth]": {
+        "group_1": [
+            "0_NormalMap_0",
+            "1_NormalMap_0",
+            "2_AlbedoMap_0"
+        ],
+        "group_8": [
+            "3_AlbedoMap_0",
+            "4_NormalMap_0"
+        ]
+    },
+    "M[AMSN_V][CL][Ov_n2][1Mask][Snow_VtxMask]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "5_GSBlendMap_AlbedoMap"
+        ],
+        "group_3": [
+            "6_GSBlendMap_NormalMap",
+            "8_GSBlendMap_NormalMap_0"
+        ],
+        "group_5": [
+            "3_GSBlendMap_AlbedoMap",
+            "7_GSBlendMap_NormalMap_0"
+        ],
+        "": [
+            "1_GSBlendMap_Mask1Map_4",
+            "4_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][CL][Ov_n2][1Mask][Snow_VtxMask][Simple]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "1_GSBlendMap_AlbedoMap",
+            "4_GSBlendMap_Mask1Map_4"
+        ],
+        "group_3": [
+            "6_GSBlendMap_NormalMap"
+        ]
+    },
+    "M[AMSN_V][CL][Ov_n2][Ice][Snow_VtxMask]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "5_GSBlendMap_AlbedoMap"
+        ],
+        "group_3": [
+            "6_GSBlendMap_NormalMap",
+            "8_GSBlendMap_NormalMap_0"
+        ],
+        "group_5": [
+            "7_GSBlendMap_NormalMap_0"
+        ],
+        "group_6": [
+            "15_GSBlendMap_AlbedoMap",
+            "9_GSBlendMap_NormalMap_0"
+        ],
+        "": [
+            "1_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][CL][Ov_n2][Ice_LOD1][Snow_VtxMask]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "5_GSBlendMap_AlbedoMap"
+        ],
+        "group_3": [
+            "8_GSBlendMap_NormalMap_0"
+        ],
+        "group_5": [
+            "7_GSBlendMap_NormalMap_0"
+        ],
+        "group_6": [
+            "15_GSBlendMap_AlbedoMap"
+        ],
+        "": [
+            "1_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][CL][Ov_n2_UV2][1Mask][Snow_VtxMask]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "5_GSBlendMap_AlbedoMap"
+        ],
+        "group_3": [
+            "6_GSBlendMap_NormalMap",
+            "8_GSBlendMap_NormalMap_0"
+        ],
+        "group_5": [
+            "3_GSBlendMap_AlbedoMap",
+            "7_GSBlendMap_NormalMap_0"
+        ],
+        "": [
+            "1_GSBlendMap_Mask1Map_4",
+            "4_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][CL][Ov_n2_UV2][1Mask][Snow_VtxMask][Simple]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "1_GSBlendMap_AlbedoMap",
+            "4_GSBlendMap_Mask1Map_4"
+        ],
+        "group_3": [
+            "6_GSBlendMap_NormalMap"
+        ]
+    },
+    "M[AMSN_V][CL]_PixcelDepth": {
+        "group_1": [
+            "1_NormalMap_0",
+            "2_AlbedoMap_0"
+        ]
+    },
+    "M[AMSN_V][ColorAdjust]": {
+        "group_1": [
+            "0__Albedo",
+            "3__Normal_Shininess"
+        ]
+    },
+    "M[AMSN_V][DitherFade]": {
+        "group_1": [
+            "0__Albedo",
+            "3__Normal_Shininess"
+        ]
+    },
+    "M[AMSN_V][DitherFade][DLC]": {
+        "group_1": [
+            "0__Albedo",
+            "3__Normal_Shininess"
+        ]
+    },
+    "M[AMSN_V][DitherFade][WhiteRoot]": {
+        "group_1": [
+            "1_NormalMap_0",
+            "2_AlbedoMap_0"
+        ]
+    },
+    "M[AMSN_V][DitherFade]_Edge": {
+        "group_1": [
+            "0__Albedo",
+            "3__Normal_Shininess"
+        ]
+    },
+    "M[AMSN_V][LocalAO]": {
+        "group_1": [
+            "1_NormalMap_0",
+            "2_AlbedoMap_0"
+        ]
+    },
+    "M[AMSN_V][Mb2][3Mask][Ov_N][EmissiveScroll_TimeIntensity]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "2_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "3_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "5_GSBlendMap_NormalMap_0"
+        ],
+        "group_5": [
+            "7_GSBlendMap_Mask3Map_4"
+        ]
+    },
+    "M[AMSN_V][Mb2][Ov_AN][CL][Floor]_Edge": {
+        "group_1": [
+            "2_GSBlendMap_AlbedoMap_1",
+            "0_GSBlendMap_NormalMap_1"
+        ],
+        "group_2": [
+            "3_GSBlendMap_AlbedoMap_2",
+            "1_GSBlendMap_NormalMap_2"
+        ],
+        "group_3": [
+            "5_GSBlendMap_NormalMap_0",
+            "6_GSBlendMap_AlbedoMap_0"
+        ],
+        "": [
+            "4_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][Mb2][Ov_AN][Emissive]": {
+        "group_1": [
+            "0_NormalMap_1",
+            "2_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_NormalMap_2",
+            "3_AlbedoMap_2"
+        ],
+        "group_3": [
+            "5_NormalMap_0",
+            "6_AlbedoMap_0"
+        ],
+        "group_6": [
+            "7_EmissiveMap"
+        ],
+        "": [
+            "4_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][Mb2][Ov_N2]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "2_GSBlendMap_AlbedoMap_1",
+            "7_GSBlendMap_NormalMap_0"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "3_GSBlendMap_AlbedoMap_2",
+            "6_GSBlendMap_NormalMap_0"
+        ],
+        "": [
+            "4_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][Mb2][Ov_N][CL][Floor]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "2_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "3_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "5_GSBlendMap_NormalMap_0"
+        ],
+        "": [
+            "4_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][Mb3][Blend2][Ov_N][CL]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "2_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "3_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "5_GSBlendMap_NormalMap_0"
+        ],
+        "group_4": [
+            "6_GSBlendMap_AlbedoMap_2",
+            "7_GSBlendMap_NormalMap_2"
+        ],
+        "": [
+            "4_GSBlendMap_Mask1Map_4",
+            "8_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][Mb4][3Mask][Ov_N][Emissive]": {
+        "group_1": [
+            "7_NormalMap_0"
+        ],
+        "group_2": [
+            "1_AlbedoMap_1",
+            "5_NormalMap_1"
+        ],
+        "group_3": [
+            "2_AlbedoMap_2",
+            "6_NormalMap_2"
+        ],
+        "group_4": [
+            "15_NormalMap_3",
+            "8_AlbedoMap_3"
+        ],
+        "group_5": [
+            "11_AlbedoMap_4",
+            "16_NormalMap_4"
+        ],
+        "group_6": [
+            "4_EmissiveMap"
+        ],
+        "": [
+            "0_Mask3Map_2",
+            "3_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][Mb4][Far_AN]_CL": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "2_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "3_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_4": [
+            "6_GSBlendMap_AlbedoMap_2",
+            "7_GSBlendMap_NormalMap_2"
+        ],
+        "group_5": [
+            "5_GSBlendMap_AlbedoMap_0",
+            "8_GSBlendMap_NormalMap_1"
+        ],
+        "": [
+            "4_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[AMSN_V][Ov_AN][CL][ColorAdjust]": {
+        "group_1": [
+            "1_AlbedoMap_0",
+            "2_NormalMap_0",
+            "7_NormalMap_0",
+            "8_AlbedoMap_0"
+        ]
+    },
+    "M[AMSN_V][Ov_N][CL]_PixelDepthOffset": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0"
+        ],
+        "group_6": [
+            "0_NormalMap_0"
+        ]
+    },
+    "M[AMSN_V][Ov_N][ColorTint]": {
+        "group_1": [
+            "0_AlbedoMap_0",
+            "1_NormalMap_0",
+            "4_NormalMap_0"
+        ]
+    },
+    "M[AMSN_V][Ov_N][CrossFade]": {
+        "group_1": [
+            "2_NormalMap_0",
+            "7_NormalMap_0",
+            "8_AlbedoMap_0"
+        ]
+    },
+    "M[AMSN_V][Ov_N][LocalAO]": {
+        "group_1": [
+            "2_NormalMap_0",
+            "7_NormalMap_0",
+            "8_AlbedoMap_0"
+        ]
+    },
+    "M[AMSN_V][Ov_N][Mb4][3Mask_ch18][Snow]": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "4_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "0_GSBlendMap_AlbedoMap_3",
+            "6_GSBlendMap_NormalMap_3"
+        ],
+        "group_4": [
+            "5_GSBlendMap_NormalMap_3",
+            "7_GSBlendMap_AlbedoMap_3"
+        ],
+        "group_5": [
+            "3_GSBlendMap_Mask1Map_4"
+        ],
+        "group_6": [
+            "9_GSBlendMap_Mask3Map_2"
+        ],
+        "group_7": [
+            "10_GSBlendMap_NormalMap_0",
+            "11_GSBlendMap_AlbedoMap_0"
+        ],
+        "group_8": [
+            "12_GSBlendMap_NormalMap_0"
+        ]
+    },
+    "M[AMSN_V][Ov_N][Mb4_ColorAdjust][3Mask_ch18][CL][PixelDepth]": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "4_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "0_GSBlendMap_AlbedoMap_3",
+            "6_GSBlendMap_NormalMap_3"
+        ],
+        "group_4": [
+            "5_GSBlendMap_NormalMap_3",
+            "7_GSBlendMap_AlbedoMap_3"
+        ],
+        "group_5": [
+            "3_GSBlendMap_Mask1Map_4"
+        ],
+        "group_6": [
+            "9_GSBlendMap_Mask3Map_2"
+        ],
+        "group_7": [
+            "10_GSBlendMap_NormalMap_0"
+        ]
+    },
+    "M[AMSN_V][Ov_N][Mb4_ColorAdjust][3Mask_ch18]_ShadowTree": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "4_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "0_GSBlendMap_AlbedoMap_3",
+            "6_GSBlendMap_NormalMap_3"
+        ],
+        "group_4": [
+            "5_GSBlendMap_NormalMap_3",
+            "7_GSBlendMap_AlbedoMap_3"
+        ],
+        "group_5": [
+            "3_GSBlendMap_Mask1Map_4"
+        ],
+        "group_6": [
+            "9_GSBlendMap_Mask3Map_2"
+        ],
+        "group_7": [
+            "10_GSBlendMap_NormalMap_0"
+        ],
+        "group_8": [
+            "11_GSBlendMap_NormalMap",
+            "12_GSBlendMap_AlbedoMap"
+        ]
+    },
+    "M[AMSN_V][Ov_N][Mb4_ColorAdjust][3Mask_ch18]_ShadowTree2": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "4_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "0_GSBlendMap_AlbedoMap_3",
+            "6_GSBlendMap_NormalMap_3"
+        ],
+        "group_4": [
+            "5_GSBlendMap_NormalMap_3",
+            "7_GSBlendMap_AlbedoMap_3"
+        ],
+        "group_5": [
+            "3_GSBlendMap_Mask1Map_4"
+        ],
+        "group_6": [
+            "9_GSBlendMap_Mask3Map_2"
+        ],
+        "group_7": [
+            "10_GSBlendMap_NormalMap_0"
+        ],
+        "group_8": [
+            "11_GSBlendMap_NormalMap",
+            "12_GSBlendMap_AlbedoMap"
+        ],
+        "": [
+            "13_GSBlendMap_AmbientOcculusionMap"
+        ]
+    },
+    "M[AMSN_V][Ov_N][Mb4_ColorAdjust][3Mask_ch18]_ShadowTree3": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "4_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "0_GSBlendMap_AlbedoMap_3",
+            "6_GSBlendMap_NormalMap_3"
+        ],
+        "group_4": [
+            "5_GSBlendMap_NormalMap_3",
+            "7_GSBlendMap_AlbedoMap_3"
+        ],
+        "group_5": [
+            "3_GSBlendMap_Mask1Map_4"
+        ],
+        "group_6": [
+            "9_GSBlendMap_Mask3Map_2"
+        ],
+        "group_7": [
+            "10_GSBlendMap_NormalMap_0"
+        ],
+        "group_8": [
+            "11_GSBlendMap_NormalMap",
+            "12_GSBlendMap_AlbedoMap"
+        ],
+        "": [
+            "13_GSBlendMap_AmbientOcculusionMap"
+        ]
+    },
+    "M[AMSN_V][Ov_N]_CL_Ivy": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0__OverlayNormal__1",
+            "1_NormalMap_0"
+        ]
+    },
+    "M[AMSN_V][Sway]_Edge_cloth": {
+        "group_1": [
+            "M_AMSN_V_Sway__Edge_snp_Texture2D_2_AlbedoMap_0",
+            "M_AMSN_V_Sway__Edge_snp_Texture2D_1_NormalMap_0"
+        ]
+    },
+    "M[AMSN_V]_Alpha_Emissive": {
+        "group_1": [
+            "1_NormalMap_0",
+            "2_AlbedoMap_0",
+            "4_AlbedoMap_0"
+        ]
+    },
+    "M[AMSN_V]_Alpha_[CL]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0"
+        ]
+    },
+    "M[AMSN_V]_Edge_Emissive": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_EmissiveMap_0",
+            "1_NormalMap_0"
+        ]
+    },
+    "M[AMSN_V]_Grass_ColorAdjust": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0"
+        ]
+    },
+    "M[A][EmissiveScroll]": {
+        "group_4": [
+            "7_GSBlendMap_Mask3Map_4"
+        ]
+    },
+    "M[A]_Fog_alpha": {
+        "group_1": [
+            "0_AlbedoMap_0"
+        ]
+    },
+    "M[Abrasion_A]_001": {
+        "group_7": [
+            "3_AlbedoMap"
+        ],
+        "group_27": [
+            "4_AlbedoMap"
+        ],
+        "group_29": [
+            "0_Mask1Map"
+        ],
+        "group_31": [
+            "1_AlbedoMap"
+        ],
+        "group_33": [
+            "2_AlbedoMap"
+        ]
+    },
+    "M[Abrasion_A]_002": {
+        "group_7": [
+            "3_AlbedoMap"
+        ],
+        "group_27": [
+            "4_AlbedoMap"
+        ],
+        "group_29": [
+            "0_Mask1Map"
+        ],
+        "group_31": [
+            "1_AlbedoMap"
+        ],
+        "group_33": [
+            "2_AlbedoMap"
+        ]
+    },
+    "M[Abrasion_A]_003": {
+        "group_7": [
+            "3_AlbedoMap"
+        ],
+        "group_27": [
+            "4_AlbedoMap"
+        ],
+        "group_29": [
+            "0_Mask1Map"
+        ],
+        "group_31": [
+            "1_AlbedoMap"
+        ],
+        "group_33": [
+            "2_AlbedoMap"
+        ]
+    },
+    "M[Abrasion_A]_004": {
+        "group_7": [
+            "3_AlbedoMap"
+        ],
+        "group_27": [
+            "4_AlbedoMap"
+        ],
+        "group_29": [
+            "0_Mask1Map"
+        ],
+        "group_31": [
+            "1_AlbedoMap"
+        ],
+        "group_33": [
+            "2_AlbedoMap"
+        ]
+    },
+    "M[AdditionalEffect][CLDLC]": {
+        "group_5": [
+            "0_Mask1Map"
+        ],
+        "group_7": [
+            "1_Mask1Map"
+        ]
+    },
+    "M[AmbientFog]": {
+        "group_3": [
+            "0_Mask3Map_0"
+        ]
+    },
+    "M[Atmosphere][Clouds][Curtain]_001": {
+        "group_15": [
+            "1_Mask1Map"
+        ],
+        "group_24": [
+            "5_AlbedoMap"
+        ]
+    },
+    "M[Atmosphere][Clouds][Day2]_001": {
+        "group_15": [
+            "1_Mask1Map"
+        ],
+        "group_18": [
+            "2_AlbedoMap"
+        ],
+        "group_24": [
+            "5_AlbedoMap"
+        ],
+        "group_28": [
+            "3_AlbedoMap"
+        ],
+        "group_29": [
+            "4_AlbedoMap"
+        ],
+        "group_34": [
+            "8_AlbedoMap"
+        ],
+        "group_35": [
+            "12_AlbedoMap"
+        ],
+        "group_36": [
+            "7_AlbedoMap"
+        ],
+        "group_38": [
+            "0_AlbedoMap"
+        ],
+        "group_39": [
+            "9_AlbedoMap"
+        ],
+        "group_43": [
+            "6__Generic__AtmosphereHazeColorLUT"
+        ],
+        "group_47": [
+            "10_FlowMap"
+        ]
+    },
+    "M[Atmosphere][Clouds]_009": {
+        "group_15": [
+            "1_Mask1Map"
+        ],
+        "group_18": [
+            "2_AlbedoMap"
+        ],
+        "group_24": [
+            "5_AlbedoMap"
+        ],
+        "group_28": [
+            "3_AlbedoMap"
+        ],
+        "group_29": [
+            "4_AlbedoMap"
+        ],
+        "group_34": [
+            "8_AlbedoMap"
+        ],
+        "group_35": [
+            "12_AlbedoMap"
+        ],
+        "group_36": [
+            "7_AlbedoMap"
+        ],
+        "group_38": [
+            "0_AlbedoMap"
+        ],
+        "group_39": [
+            "9_AlbedoMap"
+        ],
+        "group_43": [
+            "6__Generic__AtmosphereHazeColorLUT"
+        ]
+    },
+    "M[Atmosphere][Clouds]_010": {
+        "group_15": [
+            "1_Mask1Map"
+        ],
+        "group_18": [
+            "2_AlbedoMap"
+        ],
+        "group_24": [
+            "5_AlbedoMap"
+        ],
+        "group_28": [
+            "3_AlbedoMap"
+        ],
+        "group_29": [
+            "4_AlbedoMap"
+        ],
+        "group_34": [
+            "8_AlbedoMap"
+        ],
+        "group_35": [
+            "12_AlbedoMap"
+        ],
+        "group_36": [
+            "7_AlbedoMap"
+        ],
+        "group_38": [
+            "0_AlbedoMap"
+        ],
+        "group_39": [
+            "9_AlbedoMap"
+        ],
+        "group_43": [
+            "6__Generic__AtmosphereHazeColorLUT"
+        ],
+        "group_47": [
+            "10_AlbedoMap"
+        ]
+    },
+    "M[Atmosphere][Clouds]_050": {
+        "group_15": [
+            "1_Mask1Map"
+        ],
+        "group_18": [
+            "2_AlbedoMap"
+        ],
+        "group_24": [
+            "5_AlbedoMap"
+        ],
+        "group_28": [
+            "3_AlbedoMap"
+        ],
+        "group_29": [
+            "4_AlbedoMap"
+        ],
+        "group_34": [
+            "8_AlbedoMap"
+        ],
+        "group_35": [
+            "12_AlbedoMap"
+        ],
+        "group_36": [
+            "7_AlbedoMap"
+        ],
+        "group_38": [
+            "0_AlbedoMap"
+        ],
+        "group_39": [
+            "9_AlbedoMap"
+        ],
+        "group_43": [
+            "6__Generic__AtmosphereHazeColorLUT"
+        ]
+    },
+    "M[BlackGasPlane]": {
+        "group_2": [
+            "1_EmissiveMap_0"
+        ]
+    },
+    "M[Blackwave]_001": {
+        "group_5": [
+            "1_EmissiveMap_0",
+            "3_AlbedoMap_0"
+        ],
+        "group_6": [
+            "0_AlbedoMap",
+            "4_NormalMap"
+        ],
+        "group_7": [
+            "7_EmissiveMap"
+        ],
+        "group_9": [
+            "2_Mask3Map"
+        ]
+    },
+    "M[BloodDecal_ExtraBoss][CLDLC]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0"
+        ]
+    },
+    "M[BloodRiver_ExtraBoss][CLDLC]": {
+        "group_1": [
+            "3_EmissiveMap_0"
+        ],
+        "group_6": [
+            "0_Mask1Map"
+        ]
+    },
+    "M[BloodWeb_ExtraBoss][CLDLC]": {
+        "group_1": [
+            "3_AlbedoMap_0",
+            "1_NormalMap_0",
+            "2_MetallicMap_0"
+        ],
+        "group_3": [
+            "4_Mask1Map == AET370_151_1m"
+        ]
+    },
+    "M[BubbleBall][CL]_01": {
+        "group_5": [
+            "3_AlbedoMap_0"
+        ],
+        "group_6": [
+            "0_AlbedoMap",
+            "4_NormalMap"
+        ],
+        "group_7": [
+            "7_EmissiveMap"
+        ],
+        "group_9": [
+            "2_Mask3Map"
+        ],
+        "group_12": [
+            "6_Mask1Map_4"
+        ],
+        "group_13": [
+            "1_AlbedoMap"
+        ]
+    },
+    "M[Bubble_001][CL]": {
+        "group_1": [
+            "1_AlbedoMap",
+            "7_NormalMap",
+            "8_Mask1Map"
+        ],
+        "group_5": [
+            "3_Mask1Map"
+        ],
+        "group_6": [
+            "6_Mask1Map"
+        ],
+        "group_7": [
+            "2_FlowMap",
+            "9__Generic__Galaxy"
+        ],
+        "group_8": [
+            "0_AlbedoMap"
+        ],
+        "group_10": [
+            "5_FlowMap"
+        ],
+        "group_11": [
+            "4_FlowMap"
+        ],
+        "group_12": [
+            "10_EmissiveMap",
+            "11_Mask1Map"
+        ],
+        "group_13": [
+            "12_NormalMap",
+            "13_NormalMap",
+            "14_Mask1Map",
+            "15_Mask1Map"
+        ]
+    },
+    "M[CL][UsabilitySymbol]_Vegetation": {
+        "group_2": [
+            "0_AlbedoMap",
+            "2_NormalMap"
+        ],
+        "": [
+            "1_Mask1Map"
+        ]
+    },
+    "M[CL_SeaOfClouds]_001": {
+        "group_7": [
+            "2_AlbedoMap"
+        ],
+        "group_15": [
+            "1_Mask1Map"
+        ]
+    },
+    "M[Coatofarms_CL]_01": {
+        "group_1": [
+            "0_AlbedoMap",
+            "11_AlbedoMap",
+            "3_EmissiveMap_0"
+        ]
+    },
+    "M[Coatofarms_CL]_01_Dither_Fade": {
+        "group_1": [
+            "1_AlbedoMap_0",
+            "0_AlbedoMap",
+            "11_AlbedoMap",
+            "3_EmissiveMap_0"
+        ],
+        "group_6": [
+            "2_Mask3Map"
+        ]
+    },
+    "M[CrystalCurse_filter][CLDLC]_01": {
+        "": [
+            "4_EmissiveMap"
+        ]
+    },
+    "M[CrystalLiquid][CL]_001": {
+        "group_5": [
+            "3_AlbedoMap_0"
+        ],
+        "group_6": [
+            "0_AlbedoMap",
+            "4_NormalMap"
+        ],
+        "group_9": [
+            "2_Mask3Map"
+        ]
+    },
+    "M[Crystal][CrossFade]": {
+        "group_7": [
+            "1_AlbedoMap"
+        ],
+        "group_9": [
+            "10_NormalMap_0",
+            "2_MetallicMap",
+            "9_NormalMap_0"
+        ],
+        "group_10": [
+            "0_Mask1Map"
+        ]
+    },
+    "M[Crystal][Ov_N2][CrossFade]": {
+        "group_7": [
+            "1_AlbedoMap"
+        ],
+        "group_9": [
+            "10_NormalMap_0",
+            "2_MetallicMap"
+        ],
+        "group_10": [
+            "0_Mask1Map"
+        ],
+        "group_11": [
+            "4_NormalMap_0",
+            "9_NormalMap_0"
+        ]
+    },
+    "M[Crystal]_Edge": {
+        "group_7": [
+            "1_AlbedoMap"
+        ],
+        "group_9": [
+            "10_NormalMap_0",
+            "2_MetallicMap",
+            "9_NormalMap_0"
+        ],
+        "group_10": [
+            "0_Mask1Map"
+        ],
+        "": [
+            "3_Mask1Map_4"
+        ]
+    },
+    "M[Crystal_ExtraBoss][CL]": {
+        "group_7": [
+            "10_NormalMap_0",
+            "1_AlbedoMap"
+        ],
+        "group_9": [
+            "4_NormalMap_0",
+            "9_NormalMap_0"
+        ],
+        "group_10": [
+            "0_Mask1Map"
+        ]
+    },
+    "M[CumulonimbusCloudsB]_002": {
+        "group_7": [
+            "2_AlbedoMap"
+        ],
+        "group_15": [
+            "1_Mask1Map"
+        ],
+        "group_18": [
+            "0_AlbedoMap"
+        ],
+        "group_24": [
+            "5__Generic__Flowmap_1"
+        ],
+        "group_28": [
+            "4_Mask3Map"
+        ],
+        "group_29": [
+            "6_Mask1Map"
+        ]
+    },
+    "M[CumulonimbusCloudsB]_003": {
+        "group_7": [
+            "2_AlbedoMap"
+        ],
+        "group_15": [
+            "1_Mask1Map"
+        ],
+        "group_18": [
+            "0_AlbedoMap"
+        ],
+        "group_19": [
+            "3_AlbedoMap"
+        ],
+        "group_24": [
+            "5__Generic__Flowmap_1"
+        ],
+        "group_28": [
+            "4_Mask3Map"
+        ],
+        "group_29": [
+            "6_Mask1Map"
+        ]
+    },
+    "M[CumulonimbusClouds]_008": {
+        "group_7": [
+            "15_AlbedoMap",
+            "3_NormalMap"
+        ],
+        "group_18": [
+            "14_NormalMap"
+        ],
+        "group_19": [
+            "2_AlbedoMap"
+        ],
+        "group_24": [
+            "1__Generic__Flowmap_1"
+        ],
+        "group_25": [
+            "8_AlbedoMap"
+        ],
+        "group_29": [
+            "12_Mask1Map"
+        ],
+        "group_30": [
+            "0_Mask3Map"
+        ]
+    },
+    "M[Cutscene][AMSN_V][Ov_N][VA_Frame]_Edge": {
+        "group_1": [
+            "8_AlbedoMap_0",
+            "7_NormalMap_0"
+        ],
+        "group_2": [
+            "0_VectorMap",
+            "1_NormalMap"
+        ],
+        "": [
+            "2_NormalMap_0"
+        ]
+    },
+    "M[Cutscene][Blood][AMSN_V][Mb3][Ov_N]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "2_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "3_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "5_GSBlendMap_NormalMap_0"
+        ],
+        "group_4": [
+            "6_GSBlendMap_AlbedoMap_2",
+            "7_GSBlendMap_NormalMap_2"
+        ],
+        "group_5": [
+            "8_GSBlendMap_NormalMap_1"
+        ],
+        "group_8": [
+            "10_GSBlendMap_NormalMap_1",
+            "9_GSBlendMap_Mask1Map_4"
+        ],
+        "": [
+            "4_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[Cutscene][Blood][AMSN_V][Mb3][Ov_N][ForwardSSR]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "2_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "3_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "5_GSBlendMap_NormalMap_0"
+        ],
+        "group_4": [
+            "6_GSBlendMap_AlbedoMap_2",
+            "7_GSBlendMap_NormalMap_2"
+        ],
+        "group_5": [
+            "8_GSBlendMap_NormalMap_1"
+        ],
+        "group_8": [
+            "10_GSBlendMap_NormalMap_1",
+            "9_GSBlendMap_Mask1Map_4"
+        ],
+        "": [
+            "4_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[Cutscene][ShrinkingPlayArea]_MeshDecalBlend": {
+        "group_2": [
+            "0_NormalMap_1"
+        ],
+        "group_3": [
+            "2_AlbedoMap_1",
+            "5_Mask3Map"
+        ],
+        "group_4": [
+            "7_Mask3Map"
+        ],
+        "group_8": [
+            "3_Mask1Map_0"
+        ]
+    },
+    "M[Cutscene][VA_Frame][AMSN][Ov_N][CL]_PixelDepthOffset": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0"
+        ],
+        "group_6": [
+            "0_NormalMap_0"
+        ],
+        "group_7": [
+            "3_NormalMap",
+            "4_VectorMap"
+        ]
+    },
+    "M[Darkhole_ExtraBoss][CL]": {
+        "group_1": [
+            "2_AlbedoMap_0"
+        ],
+        "group_5": [
+            "0_Mask1Map_0"
+        ]
+    },
+    "M[Darkhole_Spiral_ExtraBoss][CL]": {
+        "group_1": [
+            "4_EmissiveMap_0"
+        ],
+        "group_3": [
+            "0__Flowmap__1",
+            "2_AlbedoMap_0",
+            "3_Mask1Map"
+        ],
+        "group_4": [
+            "1_Mask1Map_0"
+        ]
+    },
+    "M[DistantClouds][CL]_NoRefraction_001": {
+        "group_7": [
+            "2_AlbedoMap"
+        ],
+        "group_15": [
+            "1_Mask3Map"
+        ]
+    },
+    "M[DistantClouds][Mb]_001": {
+        "group_7": [
+            "2_AlbedoMap"
+        ],
+        "group_15": [
+            "1_Mask1Map"
+        ],
+        "group_18": [
+            "0_AlbedoMap"
+        ]
+    },
+    "M[DistantClouds]_010": {
+        "group_7": [
+            "2_AlbedoMap"
+        ],
+        "group_15": [
+            "1_Mask3Map"
+        ]
+    },
+    "M[DistantClouds]_[CL]001": {
+        "group_7": [
+            "2_AlbedoMap"
+        ]
+    },
+    "M[DistantClouds]_[CL]002": {
+        "group_7": [
+            "2_AlbedoMap"
+        ]
+    },
+    "M[Ethercurrent][CL]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "2_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "3_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "5_GSBlendMap_NormalMap_0"
+        ],
+        "group_5": [
+            "8_GSBlendMap_Mask1Map_4",
+            "9_GSBlendMap_Mask3Map_2"
+        ],
+        "group_7": [
+            "4_GSBlendMap_AlbedoMap_0",
+            "6_GSBlendMap_Mask3Map"
+        ]
+    },
+    "M[Extra_Tower_sky_003]": {
+        "group_6": [
+            "10_AlbedoMap",
+            "2_AlbedoMap",
+            "3_NormalMap_0"
+        ],
+        "group_11": [
+            "1_FlowMap",
+            "11_FlowMap"
+        ],
+        "group_12": [
+            "0_FlowMap",
+            "12_FlowMap"
+        ]
+    },
+    "M[Extra_Tower_sky_004]": {
+        "group_6": [
+            "10_AlbedoMap",
+            "2_AlbedoMap",
+            "3_NormalMap_0"
+        ],
+        "group_11": [
+            "1_FlowMap",
+            "11_FlowMap"
+        ],
+        "group_12": [
+            "0_FlowMap",
+            "12_FlowMap"
+        ]
+    },
+    "M[Extra_Tower_sky_005]": {
+        "group_6": [
+            "10_AlbedoMap"
+        ],
+        "group_11": [
+            "11_FlowMap"
+        ],
+        "group_12": [
+            "12_FlowMap"
+        ]
+    },
+    "M[Flag_ExtraBoss][CL]": {
+        "group_2": [
+            "4_EmissiveMap"
+        ],
+        "group_4": [
+            "0_VectorMap",
+            "1_VectorMap"
+        ]
+    },
+    "M[FleshFiber_ExtraBoss][CLDLC]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0"
+        ],
+        "group_6": [
+            "0_NormalMap_0"
+        ]
+    },
+    "M[FleshPetal_L1_ExtraBoss][CLDLC]": {
+        "group_1": [
+            "2_AlbedoMap_0 == AET370_161_a",
+            "1_NormalMap_0"
+        ],
+        "group_6": [
+            "0_NormalMap_0",
+            "7_Mask1Map"
+        ],
+        "group_9": [
+            "6_Mask1Map"
+        ],
+        "group_10": [
+            "8_Mask1Map_4"
+        ]
+    },
+    "M[FrostEye_ExtraBoss][CL]": {
+        "group_1": [
+            "4_EmissiveMap_0"
+        ],
+        "group_3": [
+            "0__Flowmap__1",
+            "2_AlbedoMap_0",
+            "3_Mask1Map"
+        ],
+        "group_4": [
+            "1_Mask1Map_0"
+        ]
+    },
+    "M[GhostBuilding][AMSN][Mb4]": {
+        "group_1": [
+            "11_MetallicMap_0",
+            "2_AlbedoMap",
+            "5_NormalMap_1"
+        ],
+        "group_5": [
+            "4_Mask1Map_4"
+        ],
+        "group_6": [
+            "3_NormalMap"
+        ],
+        "group_11": [
+            "1_AlbedoMap",
+            "12_MetallicMap_0",
+            "16_NormalMap_2"
+        ],
+        "group_12": [
+            "10_AlbedoMap",
+            "14_MetallicMap_0",
+            "6_NormalMap_3"
+        ],
+        "group_13": [
+            "13_MetallicMap_0",
+            "15_NormalMap_3",
+            "7_AlbedoMap"
+        ],
+        "group_14": [
+            "8_Mask1Map"
+        ]
+    },
+    "M[GhostBuilding][AMSN_V][Mb2]": {
+        "group_1": [
+            "0_NormalMap_1",
+            "2_AlbedoMap"
+        ],
+        "group_5": [
+            "4_Mask1Map_4"
+        ],
+        "group_6": [
+            "5_NormalMap"
+        ],
+        "group_11": [
+            "1_AlbedoMap",
+            "3_NormalMap"
+        ],
+        "group_12": [
+            "8_Mask1Map"
+        ]
+    },
+    "M[GhostBuilding][AMSN_V][OV_N]": {
+        "group_1": [
+            "0_NormalMap_1",
+            "2_AlbedoMap",
+            "3_NormalMap"
+        ],
+        "group_6": [
+            "4_NormalMap"
+        ],
+        "group_11": [
+            "8_Mask1Map"
+        ]
+    },
+    "M[GhostTree_Body][CLDLC]_001": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1"
+        ],
+        "group_7": [
+            "2_GSBlendMap_AlbedoMap"
+        ],
+        "group_11": [
+            "3_GSBlendMap_Mask3Map"
+        ],
+        "": [
+            "4_GSBlendMap_Mask3Map"
+        ]
+    },
+    "M[GhostTree_Body][CL]_001": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1"
+        ],
+        "group_7": [
+            "2_GSBlendMap_AlbedoMap",
+            "4_GSBlendMap_NormalMap_0"
+        ],
+        "group_11": [
+            "3_GSBlendMap_Mask3Map",
+            "1_GSBlendMap_EmissiveMap_0"
+        ]
+    },
+    "M[GhostTree_Reaf][CL]_001": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1"
+        ],
+        "group_7": [
+            "2_GSBlendMap_AlbedoMap"
+        ],
+        "group_11": [
+            "3_GSBlendMap_Mask3Map",
+            "1_GSBlendMap_EmissiveMap_0"
+        ]
+    },
+    "M[Ghost][DitherFade]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1"
+        ]
+    },
+    "M[GiantTree]": {
+        "group_6": [
+            "1_EmissiveMap"
+        ],
+        "group_7": [
+            "2_AlbedoMap"
+        ]
+    },
+    "M[GiantTree_OpenMap]_001": {
+        "group_7": [
+            "2_AlbedoMap"
+        ]
+    },
+    "M[GroundFog]_002": {
+        "group_7": [
+            "2_AlbedoMap"
+        ],
+        "group_15": [
+            "1_Mask1Map"
+        ],
+        "group_25": [
+            "0_Mask1Map"
+        ],
+        "group_27": [
+            "4_NormalMap"
+        ]
+    },
+    "M[HotSpotSparkcloud][CL]_001": {
+        "group_5": [
+            "1_Mask1Map_0",
+            "3_AlbedoMap_0",
+            "8_Mask1Map_0"
+        ],
+        "group_6": [
+            "4_NormalMap"
+        ],
+        "group_7": [
+            "7_EmissiveMap"
+        ],
+        "group_9": [
+            "2_Mask3Map"
+        ]
+    },
+    "M[LastBossEffect]_001": {
+        "group_7": [
+            "2_AlbedoMap"
+        ],
+        "group_15": [
+            "1_Mask1Map"
+        ],
+        "group_25": [
+            "0_AlbedoMap",
+            "3_AlbedoMap",
+            "4_AlbedoMap"
+        ],
+        "group_30": [
+            "5_AlbedoMap"
+        ]
+    },
+    "M[Lava][CL]PixelDepthOffset": {
+        "group_9": [
+            "3_Mask3Map"
+        ],
+        "group_10": [
+            "4_NormalMap_0"
+        ],
+        "group_11": [
+            "0_NormalMap_0",
+            "2_EmissiveMap"
+        ],
+        "group_13": [
+            "1_NormalMap_0",
+            "5_NormalMap_0"
+        ]
+    },
+    "M[LightParticle_ExtraBoss][CL]": {
+        "group_5": [
+            "0_Mask1Map"
+        ],
+        "group_7": [
+            "1_Mask1Map"
+        ]
+    },
+    "M[Luminous_Items][CL][Mb2][3Mask][Ov_N][EmissiveScroll]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "2_GSBlendMap_AlbedoMap_1",
+            "4_GSBlendMap_AlbedoMap_0"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "3_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "5_GSBlendMap_NormalMap_0"
+        ],
+        "group_5": [
+            "7_GSBlendMap_Mask3Map_4"
+        ]
+    },
+    "M[Luminous_Items][CL][Mb2][Ov_AN]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1",
+            "2_GSBlendMap_AlbedoMap_1",
+            "8_GSBlendMap_MetallicMap_0",
+            "9_GSBlendMap_AlbedoMap_0"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "3_GSBlendMap_AlbedoMap_2",
+            "7_GSBlendMap_MetallicMap_0"
+        ],
+        "group_3": [
+            "5_GSBlendMap_NormalMap_0",
+            "6_GSBlendMap_AlbedoMap_0"
+        ],
+        "": [
+            "4_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "M[Luminous_Items][CL]_001": {
+        "group_1": [
+            "3_AlbedoMap_0",
+            "1_NormalMap_0",
+            "2_MetallicMap_0",
+            "4_AlbedoMap_0"
+        ]
+    },
+    "M[MagicEffect]_Emissive_Glow[CLDLC]": {
+        "group_3": [
+            "2_AlbedoMap"
+        ],
+        "group_4": [
+            "1_Mask1Map"
+        ]
+    },
+    "M[Ocean_ExtraBoss][CL]": {
+        "group_1": [
+            "0_NormalMap_0"
+        ],
+        "group_16": [
+            "1_NormalMap_0"
+        ]
+    },
+    "M[Oil_ExtraBoss][CLDLC]": {
+        "group_1": [
+            "4_AlbedoMap",
+            "2_NormalMap_0"
+        ]
+    },
+    "M[ParticleShaft][CLDLC]": {
+        "group_5": [
+            "0_Mask1Map"
+        ],
+        "group_7": [
+            "1_Mask1Map"
+        ]
+    },
+    "M[PetalGround_ExtraBoss][CL]": {
+        "group_1": [
+            "2_EmissiveMap_0"
+        ],
+        "group_7": [
+            "5_EmissiveMap_0"
+        ],
+        "group_8": [
+            "1_Mask1Map_4"
+        ],
+        "group_9": [
+            "0_EmissiveMap_0"
+        ],
+        "": [
+            "3_Mask1Map_4"
+        ]
+    },
+    "M[PetalObj_ExtraBoss][CL]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0"
+        ],
+        "group_4": [
+            "4_AlbedoMap_0"
+        ]
+    },
+    "M[PhantomCathedral_ExtraBoss][CL]": {
+        "group_5": [
+            "0_NormalMap"
+        ]
+    },
+    "M[PlacidLake][LocalAO]": {
+        "group_10": [
+            "2_NormalMap_0"
+        ],
+        "group_11": [
+            "0_NormalMap_0"
+        ],
+        "group_16": [
+            "3_Mask1Map",
+            "4_FlowMap"
+        ]
+    },
+    "M[SandDune_ExtraBoss][CL]": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "4_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "0_GSBlendMap_AlbedoMap_3",
+            "6_GSBlendMap_NormalMap_3"
+        ],
+        "group_5": [
+            "3_GSBlendMap_Mask1Map_4"
+        ],
+        "group_6": [
+            "9_GSBlendMap_Mask3Map_2"
+        ],
+        "group_7": [
+            "10_GSBlendMap_NormalMap_0"
+        ],
+        "group_8": [
+            "5_GSBlendMap_NormalMap_0",
+            "7_GSBlendMap_AlbedoMap_3"
+        ],
+        "group_9": [
+            "11_GSBlendMap_NormalMap_0"
+        ]
+    },
+    "M[SandDune_ExtraBoss_LOD1][CL]": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_7": [
+            "0_GSBlendMap_NormalMap_1"
+        ],
+        "group_8": [
+            "5_GSBlendMap_NormalMap_0",
+            "7_GSBlendMap_AlbedoMap_3"
+        ]
+    },
+    "M[Sandfall][CLDLC]": {
+        "group_1": [
+            "1_Mask1Map"
+        ],
+        "group_23": [
+            "0_NormalMap",
+            "2_AlbedoMap"
+        ]
+    },
+    "M[ShrinkingPlayArea]": {
+        "group_2": [
+            "0_NormalMap_1",
+            "1_AlbedoMap_0",
+            "4_NormalMap_0"
+        ],
+        "group_3": [
+            "2_AlbedoMap_1",
+            "5_Mask3Map"
+        ],
+        "group_4": [
+            "7_Mask3Map"
+        ]
+    },
+    "M[Sky_m16_Base][CLDLC]": {
+        "group_6": [
+            "1_AlbedoMap",
+            "6_AlbedoMap"
+        ],
+        "group_30": [
+            "8_AlbedoMap"
+        ]
+    },
+    "M[Sky_m19_Base]": {
+        "group_6": [
+            "1_AlbedoMap",
+            "6_AlbedoMap"
+        ],
+        "group_30": [
+            "8_Mask3Map"
+        ]
+    },
+    "M[Sky_m19_SolariGraphy]": {
+        "group_1": [
+            "4_EmissiveMap_0"
+        ]
+    },
+    "M[Smoke_ExtraLobby][CL]": {
+        "group_3": [
+            "1_Mask3Map"
+        ]
+    },
+    "M[SolariGraphy_Base_ExtraBoss]": {
+        "group_1": [
+            "4_EmissiveMap_0"
+        ],
+        "": [
+            "0_Mask1Map"
+        ]
+    },
+    "M[SolariGraphy_Base_ExtraBoss][CLDLC]": {
+        "group_1": [
+            "4_EmissiveMap_0"
+        ],
+        "": [
+            "0_Mask1Map"
+        ]
+    },
+    "M[SpiritTree]_BackLightFog": {
+        "group_11": [
+            "4_Mask1Map"
+        ]
+    },
+    "M[SpiritTree]_Foreground": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "4_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "0_GSBlendMap_AlbedoMap_3",
+            "6_GSBlendMap_NormalMap_3"
+        ],
+        "group_4": [
+            "5_GSBlendMap_NormalMap_3",
+            "7_GSBlendMap_AlbedoMap_3"
+        ],
+        "group_5": [
+            "3_GSBlendMap_Mask1Map_4"
+        ],
+        "group_6": [
+            "9_GSBlendMap_Mask3Map_2"
+        ],
+        "group_7": [
+            "10_GSBlendMap_NormalMap_0"
+        ],
+        "group_9": [
+            "13_GSBlendMap_NormalMap"
+        ],
+        "group_10": [
+            "12_GSBlendMap_Mask3Map"
+        ],
+        "group_11": [
+            "14_GSBlendMap_NormalMap"
+        ],
+        "group_13": [
+            "11_GSBlendMap_Mask3Map"
+        ]
+    },
+    "M[SpiritTree]_Foreground_FarFade": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "4_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "0_GSBlendMap_AlbedoMap_3",
+            "6_GSBlendMap_NormalMap_3"
+        ],
+        "group_4": [
+            "5_GSBlendMap_NormalMap_3",
+            "7_GSBlendMap_AlbedoMap_3"
+        ],
+        "group_5": [
+            "3_GSBlendMap_Mask1Map_4"
+        ],
+        "group_6": [
+            "9_GSBlendMap_Mask3Map_2"
+        ],
+        "group_7": [
+            "10_GSBlendMap_NormalMap_0"
+        ],
+        "group_9": [
+            "13_GSBlendMap_NormalMap"
+        ],
+        "group_10": [
+            "12_GSBlendMap_Mask3Map"
+        ],
+        "group_11": [
+            "14_GSBlendMap_NormalMap"
+        ],
+        "group_13": [
+            "11_GSBlendMap_Mask3Map"
+        ]
+    },
+    "M[SpiritTree]_Foreground_Fogcolor": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "4_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "0_GSBlendMap_AlbedoMap_3",
+            "6_GSBlendMap_NormalMap_3"
+        ],
+        "group_4": [
+            "5_GSBlendMap_NormalMap_3",
+            "7_GSBlendMap_AlbedoMap_3"
+        ],
+        "group_5": [
+            "15_GSBlendMap_Mask1Map_4",
+            "3_GSBlendMap_Mask1Map_4"
+        ],
+        "group_6": [
+            "9_GSBlendMap_Mask3Map_2"
+        ],
+        "group_7": [
+            "10_GSBlendMap_NormalMap_0"
+        ],
+        "group_9": [
+            "13_GSBlendMap_NormalMap"
+        ],
+        "group_10": [
+            "12_GSBlendMap_Mask3Map"
+        ],
+        "group_11": [
+            "14_GSBlendMap_NormalMap"
+        ],
+        "group_13": [
+            "11_GSBlendMap_Mask3Map"
+        ]
+    },
+    "M[SpiritTree]_Foreground_NearFade": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "4_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "0_GSBlendMap_AlbedoMap_3",
+            "6_GSBlendMap_NormalMap_3"
+        ],
+        "group_4": [
+            "5_GSBlendMap_NormalMap_3",
+            "7_GSBlendMap_AlbedoMap_3"
+        ],
+        "group_5": [
+            "3_GSBlendMap_Mask1Map_4"
+        ],
+        "group_6": [
+            "9_GSBlendMap_Mask3Map_2"
+        ],
+        "group_7": [
+            "10_GSBlendMap_NormalMap_0"
+        ],
+        "group_9": [
+            "13_GSBlendMap_NormalMap"
+        ],
+        "group_10": [
+            "12_GSBlendMap_Mask3Map"
+        ],
+        "group_11": [
+            "14_GSBlendMap_NormalMap"
+        ],
+        "group_13": [
+            "11_GSBlendMap_Mask3Map"
+        ]
+    },
+    "M[SpiritTree]_Foreground_NearFade_Crossfooting": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "4_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "0_GSBlendMap_AlbedoMap_3",
+            "6_GSBlendMap_NormalMap_3"
+        ],
+        "group_4": [
+            "5_GSBlendMap_NormalMap_3",
+            "7_GSBlendMap_AlbedoMap_3"
+        ],
+        "group_5": [
+            "15_GSBlendMap_Mask1Map_4",
+            "3_GSBlendMap_Mask1Map_4"
+        ],
+        "group_6": [
+            "9_GSBlendMap_Mask3Map_2"
+        ],
+        "group_7": [
+            "10_GSBlendMap_NormalMap_0"
+        ],
+        "group_9": [
+            "13_GSBlendMap_NormalMap"
+        ],
+        "group_10": [
+            "12_GSBlendMap_Mask3Map"
+        ],
+        "group_11": [
+            "14_GSBlendMap_NormalMap"
+        ],
+        "group_13": [
+            "11_GSBlendMap_Mask3Map"
+        ]
+    },
+    "M[SpiritTree]_NearFade": {
+        "group_1": [
+            "3_GSBlendMap_NormalMap_1"
+        ],
+        "group_3": [
+            "1_GSBlendMap_NormalMap_0"
+        ],
+        "group_7": [
+            "2_GSBlendMap_AlbedoMap"
+        ]
+    },
+    "M[SpiritTree]_NoLight_Glow": {
+        "group_1": [
+            "1_AlbedoMap_0"
+        ]
+    },
+    "M[SpiritTree]_Twig": {
+        "group_1": [
+            "1_NormalMap_0",
+            "2_AlbedoMap",
+            "4_Mask1Map"
+        ],
+        "group_2": [
+            "0_Mask1Map"
+        ],
+        "group_6": [
+            "3_Mask1Map"
+        ],
+        "group_9": [
+            "5_Mask1Map"
+        ]
+    },
+    "M[SpiritTree_Trunk]": {
+        "group_1": [
+            "0_GSBlendMap_NormalMap_1"
+        ],
+        "group_3": [
+            "5_GSBlendMap_NormalMap_0"
+        ],
+        "group_5": [
+            "7_GSBlendMap_Mask3Map_4"
+        ],
+        "group_9": [
+            "1_GSBlendMap_Mask3Map_4"
+        ]
+    },
+    "M[SpiritTree_Twig]_Emissive_Glow_VtxFade": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0"
+        ]
+    },
+    "M[SpritTree_Debris][1Mask_Edge]": {
+        "group_1": [
+            "2_Mask1Map_0",
+            "1_AlbedoMap",
+            "3_NormalMap"
+        ]
+    },
+    "M[SynapseLine_ExtraBoss][CL]": {
+        "group_1": [
+            "4_EmissiveMap_0"
+        ],
+        "group_3": [
+            "0__Flowmap__1",
+            "2_Mask1Map"
+        ],
+        "group_4": [
+            "1_Mask1Map_0"
+        ]
+    },
+    "M[SynapseRing_ExtraBoss][CL]": {
+        "group_1": [
+            "4_EmissiveMap_0"
+        ],
+        "group_3": [
+            "0__Flowmap__1",
+            "2_Mask1Map"
+        ],
+        "group_4": [
+            "1_Mask1Map_0"
+        ]
+    },
+    "M[Tombstoneletters_CL]_01": {
+        "group_1": [
+            "2_AlbedoMap",
+            "9_EmissiveMap_0"
+        ],
+        "group_7": [
+            "4_Mask3Map"
+        ]
+    },
+    "M[TransparentPetal_ExtraBoss][CLDLC]": {
+        "group_5": [
+            "0_NormalMap",
+            "1_EmissiveMap"
+        ]
+    },
+    "M[TreeSap][Mb2][Fresnel][CL]_em_001": {
+        "group_7": [
+            "0_AlbedoMap",
+            "1_AlbedoMap",
+            "10_NormalMap_0",
+            "2_Mask1Map",
+            "3_NormalMap_0",
+            "4_NormalMap_0"
+        ],
+        "group_16": [
+            "5_AlbedoMap_0",
+            "6_Mask3Map"
+        ]
+    },
+    "M[WarpPoint][CL]_Base_001": {
+        "group_5": [
+            "3_AlbedoMap_0"
+        ],
+        "group_6": [
+            "0_AlbedoMap",
+            "4_NormalMap"
+        ],
+        "group_7": [
+            "7_EmissiveMap",
+            "1_EmissiveMap"
+        ],
+        "group_9": [
+            "2_Mask3Map"
+        ]
+    },
+    "M[Water][ocean4][CL]_PlanarReflection": {
+        "group_4": [
+            "3_Mask1Map"
+        ],
+        "group_10": [
+            "2_NormalMap_0"
+        ],
+        "group_11": [
+            "0_NormalMap_0"
+        ],
+        "group_14": [
+            "1_NormalMap_0"
+        ],
+        "group_17": [
+            "4_Mask3Map"
+        ],
+        "group_20": [
+            "5_Mask3Map"
+        ]
+    },
+    "M[Waterfall]_Underground": {
+        "group_1": [
+            "5_NormalMap"
+        ],
+        "group_20": [
+            "1_Mask1Map",
+            "2_Mask1Map"
+        ],
+        "group_21": [
+            "0_Mask1Map",
+            "4_Mask3Map"
+        ]
+    },
+    "M[Waterfall]_Underground_Transparent": {
+        "group_1": [
+            "5_NormalMap"
+        ],
+        "group_20": [
+            "1_Mask1Map",
+            "2_Mask1Map"
+        ],
+        "group_21": [
+            "0_Mask1Map",
+            "4_Mask3Map"
+        ]
+    },
+    "M[WorldTree_LightShaft_DLC]": {
+        "group_1": [
+            "0_Mask3Map_0"
+        ]
+    },
+    "M[candle][CL]_Translucency_02": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "0_AlbedoMap",
+            "1_NormalMap_0"
+        ]
+    },
+    "M[supercell_CL]": {
+        "group_1": [
+            "4_NormalMap"
+        ],
+        "group_7": [
+            "0_Mask1Map",
+            "1_NormalMap"
+        ],
+        "group_14": [
+            "2_Mask3Map"
+        ],
+        "group_15": [
+            "3_Mask3Map"
+        ],
+        "group_19": [
+            "5_AlbedoMap",
+            "6_AlbedoMap"
+        ]
+    },
+    "M[supercell_CL_02]": {
+        "group_1": [
+            "4_NormalMap"
+        ],
+        "group_7": [
+            "0_Mask1Map",
+            "1_NormalMap"
+        ],
+        "group_14": [
+            "2_Mask3Map"
+        ],
+        "group_15": [
+            "3_Mask3Map"
+        ],
+        "group_19": [
+            "5_AlbedoMap",
+            "6_AlbedoMap"
+        ],
+        "group_23": [
+            "7_NormalMap"
+        ]
+    },
+    "M[supercell_CL_04]": {
+        "group_1": [
+            "4_NormalMap"
+        ],
+        "group_7": [
+            "0_Mask1Map",
+            "1_NormalMap"
+        ],
+        "group_14": [
+            "2_Mask3Map"
+        ],
+        "group_15": [
+            "3_Mask3Map"
+        ],
+        "group_19": [
+            "5_AlbedoMap",
+            "6_AlbedoMap"
+        ]
+    },
+    "M[supercell_sub_CL_01]": {
+        "group_1": [
+            "2_AlbedoMap_0",
+            "1_NormalMap_0"
+        ]
+    },
+    "M_Emissive": {
+        "group_1": [
+            "4_EmissiveMap_0"
+        ]
+    },
+    "Map_Extra_Test_kashik_002": {
+        "": [
+            "0_Mask1Map",
+            "4_Mask1Map",
+            "1_Mask1Map"
+        ]
+    },
+    "P[BD_5050]_Eye": {
+        "group_3": [
+            "2_NormalMap",
+            "4_Mask1Map",
+            "6_Mask3Map",
+            "8_AlbedoMap"
+        ]
+    },
+    "P[BD_5050]_Skin": {
+        "group_1": [
+            "7_AlbedoMap",
+            "0_NormalMap",
+            "2_Mask3Map"
+        ],
+        "group_11": [
+            "12_NormalMap == AAT500_skin_02_n",
+            "6_NormalMap == AAT500_skin_01_n",
+            "9_NormalMap == AAT500_skin_03_n"
+        ],
+        "group_12": [
+            "3_AlbedoMap == AAT500_Beard_01_a"
+        ],
+        "group_13": [
+            "1_NormalMap",
+            "4_AlbedoMap"
+        ],
+        "group_18": [
+            "5_Mask3Map"
+        ],
+        "group_19": [
+            "10_Mask1Map",
+            "8_EmissiveMap"
+        ]
+    },
+    "P[WP_A_5032]_AuraMantle": {
+        "group_1": [
+            "1_EmissiveMap",
+            "7_NormalMap_4"
+        ],
+        "group_2": [
+            "3_Mask1Map == AAT100_Crystal_g"
+        ],
+        "group_4": [
+            "4_NormalMap",
+            "5_VectorMap"
+        ]
+    },
+    "P[WP_A_5032]_AuraMantle_cloth": {
+        "group_1": [
+            "P_WP_A_5032__AuraMantle_snp_Texture2D_1_EmissiveMap",
+            "P_WP_A_5032__AuraMantle_snp_Texture2D_7_NormalMap_4"
+        ],
+        "group_2": [
+            "P_WP_A_5032__AuraMantle_snp_Texture2D_3_Mask1Map == AAT100_Crystal_g"
+        ],
+        "group_4": [
+            "P_WP_A_5032__AuraMantle_snp_Texture2D_4_NormalMap",
+            "P_WP_A_5032__AuraMantle_snp_Texture2D_5_VectorMap"
+        ]
+    },
+    "P[WP_A_5091]_Trance": {
+        "group_4": [
+            "3_AlbedoMap"
+        ],
+        "group_5": [
+            "0_Mask1Map"
+        ],
+        "group_6": [
+            "1_Mask1Map",
+            "4_Mask3Map"
+        ],
+        "group_14": [
+            "2_Fade_and_FallOff_Noise"
+        ]
+    },
+    "P[WP_A_5091]_[ChrCustomize][Eye]": {
+        "group_3": [
+            "2_NormalMap",
+            "4_Mask1Map",
+            "6_Mask3Map",
+            "8_AlbedoMap"
+        ],
+        "group_9": [
+            "1_AlbedoMap",
+            "3_NormalMap",
+            "5_Mask3Map"
+        ]
+    },
+    "S[AMSN]": {
+        "group_1": [
+            "0_AlbedoMap_0",
+            "1_NormalMap_0",
+            "2_MetallicMap_0"
+        ]
+    },
+    "S[AMSN]_Edge": {
+        "group_1": [
+            "3_AlbedoMap_0",
+            "1_NormalMap_0",
+            "2_MetallicMap_0"
+        ]
+    },
+    "S[AMSN]_di_eye": {
+        "group_1": [
+            "3_AlbedoMap_0",
+            "1_NormalMap_0",
+            "2_MetallicMap_0"
+        ],
+        "": [
+            "0_AlbedoMap"
+        ]
+    },
+    "S[AMSN_CL]_Alpha": {
+        "group_1": [
+            "3_AlbedoMap_0",
+            "1_NormalMap_0",
+            "2_MetallicMap_0"
+        ]
+    },
+    "S[A]": {
+        "": [
+            "0_AlbedoMap_0"
+        ]
+    },
+    "S[A][Test]": {
+        "": [
+            "0_AlbedoMap_0"
+        ]
+    },
+    "S[Aurora02]": {
+        "": [
+            "4_AlbedoMap_0",
+            "5_AlbedoMap_0"
+        ]
+    },
+    "S[AuroraCircle]": {
+        "": [
+            "4_AlbedoMap_0",
+            "5_AlbedoMap_0"
+        ]
+    },
+    "S[Aurora]": {
+        "": [
+            "0_Mask1Map",
+            "3_AlbedoMap_1",
+            "4_Mask1Map_0",
+            "5_AlbedoMap_0"
+        ]
+    },
+    "S[BloodBall]": {
+        "group_5": [
+            "3_AlbedoMap_0"
+        ],
+        "group_6": [
+            "0_AlbedoMap",
+            "4_NormalMap"
+        ],
+        "group_7": [
+            "7_EmissiveMap",
+            "1_EmissiveMap"
+        ],
+        "group_9": [
+            "2_Mask3Map"
+        ]
+    },
+    "S[CandleFire]": {
+        "group_1": [
+            "0_AlbedoMap_0"
+        ],
+        "": [
+            "3_Mask3Map"
+        ]
+    },
+    "S[Cursed_Crystal02]": {
+        "group_1": [
+            "5_AlbedoMap",
+            "7_NormalMap"
+        ],
+        "group_3": [
+            "1_AlbedoMap",
+            "2__DistortionDepth"
+        ]
+    },
+    "S[Gero]": {
+        "group_1": [
+            "3_AlbedoMap_0",
+            "1_NormalMap_0",
+            "2_MetallicMap_0",
+            "4__VertexOffsetMask__1"
+        ]
+    },
+    "S[Insect]": {
+        "group_5": [
+            "1_AlbedoMap_0"
+        ],
+        "group_9": [
+            "3_Mask3Map"
+        ]
+    },
+    "S[Item_Falloff]": {
+        "group_1": [
+            "7_NormalMap_4",
+            "0_MetallicMap_0",
+            "2_AlbedoMap_0"
+        ],
+        "group_2": [
+            "3_Mask1Map"
+        ]
+    },
+    "S[KillingBall]_Base_01": {
+        "group_5": [
+            "1_AlbedoMap_0",
+            "8_AlbedoMap_0",
+            "3_AlbedoMap_0"
+        ],
+        "group_6": [
+            "4_NormalMap"
+        ],
+        "group_7": [
+            "7_EmissiveMap"
+        ],
+        "group_9": [
+            "2_Mask3Map"
+        ]
+    },
+    "S[Liquid]_di_vertexOffset": {
+        "group_1": [
+            "3_AlbedoMap_0",
+            "1_NormalMap_0",
+            "2_MetallicMap_0",
+            "4__VertexOffsetMask__1"
+        ]
+    },
+    "S[Liquid_Artorias]": {
+        "group_1": [
+            "3_AlbedoMap_0",
+            "1_NormalMap_0",
+            "2_MetallicMap_0",
+            "4__VertexOffsetMask__1"
+        ]
+    },
+    "S[MimicHead]": {
+        "group_3": [
+            "0_AlbedoMap == s34020_a"
+        ],
+        "group_4": [
+            "7_NormalMap == s00008_n"
+        ]
+    },
+    "S[TransparentPetal_ExtraBoss][CLDLC]": {
+        "group_5": [
+            "0_NormalMap",
+            "1_EmissiveMap"
+        ]
+    },
+    "S[Vessels]": {
+        "group_1": [
+            "4_AlbedoMap_0",
+            "3_AlbedoMap_0"
+        ],
+        "": [
+            "0_AlbedoMap",
+            "1_AlbedoMap",
+            "2_Mask3Map"
+        ]
+    },
+    "S[WarpPoint]": {
+        "group_5": [
+            "3_AlbedoMap_0"
+        ],
+        "group_6": [
+            "0_AlbedoMap",
+            "4_NormalMap"
+        ],
+        "group_7": [
+            "7_EmissiveMap",
+            "1_EmissiveMap"
+        ],
+        "group_9": [
+            "2_Mask3Map"
+        ]
+    },
+    "S[Weapon]": {
+        "": [
+            "5_AlbedoMap_0",
+            "4_AlbedoMap_0"
+        ]
+    },
+    "S[wave]": {
+        "group_5": [
+            "3_AlbedoMap_0"
+        ],
+        "group_6": [
+            "0_AlbedoMap"
+        ],
+        "group_7": [
+            "7_EmissiveMap"
+        ],
+        "group_9": [
+            "2_Mask3Map"
+        ]
+    },
+    "Test_M[ShrinkingCloud2]": {
+        "group_1": [
+            "0_AlbedoMap"
+        ]
+    },
+    "Test_M[ShrinkingFlame]": {
+        "": [
+            "0_Mask3Map"
+        ]
+    },
+    "kashik_Test_Emissive_texscroll_001": {
+        "group_1": [
+            "0_NormalMap_0",
+            "1_NormalMap_0",
+            "2_AlbedoMap_0",
+            "3_Mask1Map",
+            "4_EmissiveMap_0"
+        ]
+    },
+    "kashik_Test_LavaWaterFall_001": {
+        "group_1": [
+            "2_GSBlendMap_NormalMap_1",
+            "8_GSBlendMap_AlbedoMap_1"
+        ],
+        "group_2": [
+            "1_GSBlendMap_NormalMap_2",
+            "4_GSBlendMap_AlbedoMap_2"
+        ],
+        "group_3": [
+            "5_GSBlendMap_Mask1Map_1",
+            "7_GSBlendMap_Mask1Map_2"
+        ],
+        "": [
+            "3_GSBlendMap_Mask1Map_4"
+        ]
+    },
+    "kashik_Test_Rock_007": {
+        "group_1": [
+            "13_AlbedoMap_0",
+            "7_NormalMap_0"
+        ],
+        "group_2": [
+            "1_AlbedoMap_1",
+            "5_NormalMap_1"
+        ],
+        "group_3": [
+            "2_AlbedoMap_2",
+            "6_NormalMap_2"
+        ],
+        "group_4": [
+            "15_NormalMap_3",
+            "8_AlbedoMap_3"
+        ],
+        "group_5": [
+            "11_AlbedoMap_4",
+            "16_NormalMap_4"
+        ],
+        "": [
+            "0_Mask3Map_2",
+            "3_Mask1Map_4"
+        ]
+    },
+    "kashik_Test_Sky_001": {
+        "group_15": [
+            "1_Mask1Map"
+        ],
+        "group_18": [
+            "2_AlbedoMap"
+        ],
+        "group_24": [
+            "5_AlbedoMap"
+        ],
+        "group_28": [
+            "3_AlbedoMap"
+        ],
+        "group_29": [
+            "4_AlbedoMap"
+        ],
+        "group_34": [
+            "8_AlbedoMap"
+        ],
+        "group_35": [
+            "12_AlbedoMap"
+        ],
+        "group_36": [
+            "7_AlbedoMap"
+        ],
+        "group_38": [
+            "0_AlbedoMap"
+        ],
+        "group_39": [
+            "9_AlbedoMap"
+        ],
+        "group_43": [
+            "6__Generic__AtmosphereHazeColorLUT"
+        ]
+    },
+    "kashik_Test_Sky_002": {
+        "group_6": [
+            "10_AlbedoMap"
+        ],
+        "group_11": [
+            "11_FlowMap"
+        ],
+        "group_12": [
+            "12_FlowMap"
+        ]
+    },
+    "kashik_Test_VA_001": {
+        "group_1": [
+            "2_AlbedoMap",
+            "3_NormalMap"
+        ],
+        "group_17": [
+            "0_VertexAnimationTransfer",
+            "1_VertexAnimationNormal"
+        ],
+        "group_18": [
+            "5_Mask3Map_4"
+        ],
+        "group_19": [
+            "4_Mask1Map_4",
+            "6_AlbedoMap",
+            "7_NormalMap",
+            "8_NormalMap"
+        ]
+    },
+    "kashik_Test_VA_002": {
+        "group_1": [
+            "2_AlbedoMap",
+            "3_NormalMap"
+        ],
+        "group_17": [
+            "0_VertexAnimationTransfer",
+            "1_VertexAnimationNormal"
+        ],
+        "group_18": [
+            "5_Mask3Map_4"
+        ],
+        "group_19": [
+            "4_Mask1Map_4",
+            "6_AlbedoMap",
+            "7_NormalMap",
+            "8_NormalMap"
+        ]
+    },
+    "kashik_Test_supercell_001": {
+        "group_1": [
+            "4_NormalMap"
+        ],
+        "group_7": [
+            "0_Mask1Map",
+            "1_NormalMap"
+        ],
+        "group_14": [
+            "2_Mask3Map"
+        ],
+        "group_15": [
+            "3_Mask1Map"
+        ],
+        "group_19": [
+            "5_AlbedoMap",
+            "6_AlbedoMap"
+        ]
+    },
+    "kashik_Test_texscroll_001": {
+        "group_15": [
+            "0_Mask1Map"
+        ],
+        "group_22": [
+            "1_AlbedoMap",
+            "2_NormalMap",
+            "3_Mask1Map"
+        ]
+    }
+}
