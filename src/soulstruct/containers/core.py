@@ -1342,6 +1342,18 @@ class Binder(BaseBinaryFile):
         """Returns a list of entries whose names match the given `regex` pattern."""
         return self._find_entries_by_attr_regex(pattern, "name", flags=flags, escape=escape)
 
+    # Compatibility alias for soulstruct-havok (expects *_matching_name).
+    def find_entry_matching_name(
+        self, pattern: str | re.Pattern, flags=0, escape=False,
+    ) -> BinderEntry:
+        return self.find_entry_by_name_regex(pattern, flags=flags, escape=escape)
+
+    # Compatibility alias for soulstruct-havok (expects *_matching_name).
+    def find_entries_matching_name(
+        self, pattern: str | re.Pattern, flags=0, escape=False,
+    ) -> list[BinderEntry]:
+        return self.find_entries_by_name_regex(pattern, flags=flags, escape=escape)
+
     def __getitem__(self, entry_spec: int | Path | str | re.Pattern) -> BinderEntry:
         """Convenient shortcut for finding an entry by ID (int), full path (Path), name only (str), or by matching
         its name with regex (`re.Pattern`).
