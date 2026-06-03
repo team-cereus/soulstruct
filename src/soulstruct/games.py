@@ -16,6 +16,7 @@ __all__ = [
     "DARK_SOULS_3",
     "SEKIRO",
     "ELDEN_RING",
+    "NIGHTREIGN",
 ]
 
 import importlib
@@ -297,6 +298,9 @@ ELDEN_RING = Game(
     default_dcx_type=DCXType.DCX_KRAK,
     special_dcx_types={
         ".bin": DCXType.Null,
+        # HKX animation clips inside ANIBND are raw tagfiles, not DCX (only the outer .anibnd.dcx is compressed).
+        ".hkx": DCXType.Null,
+        "hkx": DCXType.Null,
     },
     bundled_resource_paths={
         "PARAMDEFBND": SOULSTRUCT_PATH("eldenring/params/paramdef/Paramdex"),  # loaded as Paramdex XML
@@ -316,6 +320,23 @@ ELDEN_RING = Game(
 )
 
 
+NIGHTREIGN = Game(
+    variable_name="NIGHTREIGN",
+    name="Elden Ring: Nightreign",
+    abbreviated_name="nr",
+    submodule_name="nightreign",
+    aliases=("nightreign", "nr", "eldenringnightreign", "ernr"),
+    default_dcx_type=DCXType.DCX_KRAK,
+    special_dcx_types=dict(ELDEN_RING.special_dcx_types),
+    bundled_resource_paths=dict(ELDEN_RING.bundled_resource_paths),
+    steam_appid=2622380,
+    default_game_path=NIGHTREIGN_PATH,
+    executable_name="nightreign.exe",
+    interroot_prefix="N:\\GR\\data\\INTERROOT_win64",
+    default_file_paths=dict(ELDEN_RING.default_file_paths),
+)
+
+
 # List of all games.
 GAMES = (
     DEMONS_SOULS,
@@ -327,6 +348,7 @@ GAMES = (
     DARK_SOULS_3,
     SEKIRO,
     ELDEN_RING,
+    NIGHTREIGN,
 )
 
 

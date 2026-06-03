@@ -9,6 +9,7 @@ __all__ = [
     "DS3_PATH",
     "SEKIRO_PATH",
     "ELDEN_RING_PATH",
+    "NIGHTREIGN_PATH",
 
     "PARAMDEX_PATH",
     "LOG_PATH",
@@ -138,6 +139,7 @@ BB_PATH = __config.get("BB_PATH")  # type: Path
 DS3_PATH = __config.get("DS3_PATH")  # type: Path
 SEKIRO_PATH = __config.get("SEKIRO_PATH")  # type: Path
 ELDEN_RING_PATH = __config.get("ELDEN_RING_PATH")  # type: Path
+NIGHTREIGN_PATH = __config.get("NIGHTREIGN_PATH")  # type: Path
 PARAMDEX_PATH = __config.get("PARAMDEX_PATH")  # type: Path
 
 LOG_PATH = __config.get("LOG_PATH")  # type: Path
