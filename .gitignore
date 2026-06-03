@@ -2,6 +2,7 @@ project_config.json
 soulstruct_config.json
 __address_cache__
 venv*/
+uv.lock
 
 # Test files/folders
 soulstruct/_test*
