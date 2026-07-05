@@ -25,7 +25,7 @@ from dataclasses import dataclass, field
 from functools import singledispatchmethod
 from pathlib import Path
 
-from soulstruct.config import *
+from soulstruct.config import Config
 from soulstruct.dcx import DCXType
 from soulstruct.utilities.files import SOULSTRUCT_PATH
 
@@ -124,7 +124,7 @@ DEMONS_SOULS = Game(
         "MTDBND": SOULSTRUCT_PATH("demonssouls/models/resources/mtd.mtdbnd.dcx"),
     },
     steam_appid=None,
-    default_game_path=DES_PATH,
+    default_game_path=Config.DES_PATH,
     executable_name="EBOOT.BIN",
     interroot_prefix="N:\\DemonsSoul\\data\\DVDROOT",
     default_file_paths={
@@ -152,7 +152,7 @@ DARK_SOULS_PTDE = Game(
         "MTDBND": SOULSTRUCT_PATH("darksouls1ptde/models/resources/Mtd.mtdbnd"),
     },
     steam_appid=211420,
-    default_game_path=PTDE_PATH,
+    default_game_path=Config.PTDE_PATH,
     generic_game_path=Path("C:/Program Files (x86)/Steam/steamapps/common/Dark Souls Prepare to Die Edition/DATA"),
     save_file_path=Path("~/Documents/NBGI/DarkSouls").expanduser(),
     executable_name="DARKSOULS.exe",
@@ -193,7 +193,7 @@ DARK_SOULS_DSR = Game(
         "PATCH_MTDBND": SOULSTRUCT_PATH("darksouls1r/models/resources/MtdPatch.mtdbnd.dcx"),
     },
     steam_appid=570940,
-    default_game_path=DSR_PATH,
+    default_game_path=Config.DSR_PATH,
     generic_game_path=Path("C:/Program Files (x86)/Steam/steamapps/common/DARK SOULS REMASTERED"),
     save_file_path=Path("~/Documents/NBGI/DARK SOULS REMASTERED").expanduser(),
     executable_name="DarkSoulsRemastered.exe",
@@ -219,7 +219,7 @@ DARK_SOULS_2 = Game(
     submodule_name="darksouls2",
     aliases=("darksouls2", "ds2", "dks2"),
     default_dcx_type=DCXType.DCX_DFLT_10000_24_9,
-    default_game_path=DS2_PATH,
+    default_game_path=Config.DS2_PATH,
 )
 
 
@@ -230,7 +230,7 @@ DARK_SOULS_2_SOTFS = Game(
     submodule_name="darksouls2",  # TODO: Currently identical to DS2.
     aliases=("darksouls2sotfs", "ds2sotfs", "dks2sotfs", "sotfs"),
     default_dcx_type=DCXType.DCX_DFLT_10000_24_9,
-    default_game_path=DS2_SOTFS_PATH,
+    default_game_path=Config.DS2_SOTFS_PATH,
 )
 
 
@@ -246,7 +246,7 @@ BLOODBORNE = Game(
         "MTDBND": SOULSTRUCT_PATH("bloodborne/models/resources/allmaterialbnd.mtdbnd.dcx"),
     },
     steam_appid=None,
-    default_game_path=BB_PATH,
+    default_game_path=Config.BB_PATH,
     generic_game_path=Path("C:/Bloodborne/DISC/Image0/dvdroot_ps4"),  # dummy
     executable_name="../eboot.bin",
     interroot_prefix="N:\\SPRJ\\data\\INTERROOT_ps4",
@@ -269,7 +269,7 @@ DARK_SOULS_3 = Game(
     submodule_name="darksouls3",
     aliases=("darksouls3", "ds3", "dks3"),
     default_dcx_type=DCXType.DCX_DFLT_10000_44_9,
-    default_game_path=DS3_PATH,
+    default_game_path=Config.DS3_PATH,
     generic_game_path=Path("C:/Program Files (x86)/Steam/steamapps/common/DARK SOULS III/Game"),
     executable_name="DarkSoulsIII.exe",
     interroot_prefix="N:\\FDP\\data\\INTERROOT_win64",
@@ -283,7 +283,7 @@ SEKIRO = Game(
     submodule_name="sekiro",
     aliases=("sekiro", "sekiroshadowsdietwice", "sdt"),
     default_dcx_type=DCXType.DCX_KRAK,
-    default_game_path=SEKIRO_PATH,
+    default_game_path=Config.SEK_PATH,
     generic_game_path=Path("C:/Program Files (x86)/Steam/steamapps/common/Sekiro"),  # TODO: "/Game"?
     interroot_prefix="N:\\NTC\\data\\Target\\INTERROOT_win64",
 )
@@ -309,7 +309,7 @@ ELDEN_RING = Game(
         "dlc02_MATBINBND": SOULSTRUCT_PATH("eldenring/models/resources/allmaterial_dlc02.matbinbnd.dcx"),
     },
     steam_appid=1245620,
-    default_game_path=ELDEN_RING_PATH,
+    default_game_path=Config.ER_PATH,
     executable_name="ELDENRING.exe",
     interroot_prefix="N:\\GR\\data\\INTERROOT_win64",
     default_file_paths={
@@ -330,7 +330,7 @@ NIGHTREIGN = Game(
     special_dcx_types=dict(ELDEN_RING.special_dcx_types),
     bundled_resource_paths=dict(ELDEN_RING.bundled_resource_paths),
     steam_appid=2622380,
-    default_game_path=NIGHTREIGN_PATH,
+    default_game_path=Config.NIGHTREIGN_PATH,
     executable_name="nightreign.exe",
     interroot_prefix="N:\\GR\\data\\INTERROOT_win64",
     default_file_paths=dict(ELDEN_RING.default_file_paths),

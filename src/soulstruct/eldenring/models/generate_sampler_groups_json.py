@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 
 from soulstruct.base.models.matbin import MATBIN, MATBINBND
-from soulstruct.config import ELDEN_RING_PATH
+from soulstruct.config import Config
 from soulstruct.containers import Binder, BinderEntry, EntryNotFoundError
 from soulstruct.utilities.binary import BinaryReader
 from soulstruct.utilities.files import SOULSTRUCT_PATH, read_json, write_json
@@ -200,7 +200,7 @@ def main():
     parser.add_argument(
         "--game-root",
         type=Path,
-        default=ELDEN_RING_PATH,
+        default=Config.ER_PATH,
         help="Path to the game 'Game' directory containing shader/ and material/ folders.",
     )
     parser.add_argument(
