@@ -357,7 +357,14 @@ class MergedMesh:
                             merged_field_sources.setdefault(field_name, {}).update({i: (va_index, field_name)})
 
         # Structured array for mixed dtypes.
-        all_vertices = np.empty(total_vertex_count, dtype=dtype)  # will be fully initialized
+        all_vertices = np.empty(total_vertex_count, dtype=dtype)
+        # `bone_weights`/`bone_indices` are only filled below for meshes whose vertex layout actually
+        # contains those fields. Rigid meshes (e.g. weapon FLVERs) have neither field, so without this
+        # initialization those columns would keep uninitialized `np.empty` garbage and later crash the
+        # Blender importer's vertex-group assignment with out-of-range bone indices. Defaulting to bone 0
+        # with zero weight makes such meshes bind rigidly to the root bone, which is correct.
+        all_vertices["bone_indices"] = 0
+        all_vertices["bone_weights"] = 0.0
 
         loop_field_names = {name for name in merged_field_sources if name not in all_vertices.dtype.names}
         loops = MergedMeshLoops.get_empty(loop_field_names, size=total_vertex_count)
