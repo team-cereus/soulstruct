@@ -66,6 +66,16 @@ class FLVERBone:
         except ValueError as exc:
             raise ValueError(f"Bone {self.name!r} is not in the given FLVER bone list.") from exc
 
+    @property
+    def is_default_origin(self) -> bool:
+        """True for a single identity root bone (typical map-piece default)."""
+        return (
+            self.translate == Vector3.zero()
+            and self.rotate == EulerRad.zero()
+            and self.scale == Vector3.one()
+            and self.parent_bone_index == -1
+        )
+
     @classmethod
     def from_flver_reader(cls, reader: BinaryReader, encoding: str) -> FLVERBone:
         """Returns `FLVERBone` instance without dereferenced connected bones."""
