@@ -11,7 +11,7 @@ from pathlib import Path
 
 from soulstruct.base.game_file import GameFile
 from soulstruct.games import Game, get_game
-from soulstruct.containers import Binder, EntryNotFoundError
+from soulstruct.containers import Binder, BinderEntry, EntryNotFoundError
 from soulstruct.utilities.binary import *
 from soulstruct.utilities.maths import Vector2
 
@@ -452,6 +452,10 @@ class MATBINSampler:
         writer.pack_z_string(self.path, encoding="utf-16-le")
 
 
+# MATBINBND id -> (entries list, entry count, {lowercase entry name: entry}); see `MATBINBND.get_matbin`.
+_ENTRY_NAME_INDEXES: dict[int, tuple[list, int, dict[str, BinderEntry]]] = {}
+
+
 class MATBINBND(Binder):
 
     IS_SPLIT_BXF: tp.ClassVar[bool] = False
@@ -471,14 +475,25 @@ class MATBINBND(Binder):
         try:
             return self.matbins[matbin_name]
         except KeyError:
-            try:
-                # Need to ignore case.
-                matbin_entry = self.find_entry_by_name_regex(re.escape(matbin_name), re.IGNORECASE)
-            except EntryNotFoundError:
+            # Case-insensitive name index, built once: a regex scan of every entry per lookup took ~0.3 s each in
+            # Elden Ring / Nightreign (~20k entries). Some names occur in two folders (e.g. Map_m60_00 and
+            # Map_Preset); the first entry wins, as it did before an exact-match requirement was added.
+            matbin_entry = self._entries_by_lower_name().get(matbin_name.lower())
+            if matbin_entry is None:
                 raise KeyError(f"MATBIN '{matbin_name}' not found in {self.__class__.__name__}.")
             matbin = matbin_entry.to_binary_file(MATBIN)
             self.matbins[matbin_name] = matbin
             return matbin
+
+    def _entries_by_lower_name(self) -> dict[str, BinderEntry]:
+        cached = _ENTRY_NAME_INDEXES.get(id(self))
+        if cached is not None and cached[0] is self.entries and cached[1] == len(self.entries):
+            return cached[2]
+        index = {}
+        for entry in self.entries:
+            index.setdefault(entry.name.lower(), entry)
+        _ENTRY_NAME_INDEXES[id(self)] = (self.entries, len(self.entries), index)
+        return index
 
     def load_all_matbins(self):
         """Load all MATBINs in the Binder into memory."""
