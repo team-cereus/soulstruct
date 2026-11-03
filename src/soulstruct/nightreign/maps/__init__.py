@@ -1,6 +1,6 @@
 from soulstruct.eldenring.maps.constants import *  # noqa: F403
 from soulstruct.eldenring.maps.msb.models import *  # noqa: F403
-from soulstruct.eldenring.maps.msb.parts import *  # noqa: F403
+from .parts import *  # noqa: F403
 from soulstruct.eldenring.maps.msb.routes import *  # noqa: F403
 from soulstruct.eldenring.maps.map_studio_directory import MapStudioDirectory
 from soulstruct.base.maps.enum_module_generator import EnumModuleGenerator
