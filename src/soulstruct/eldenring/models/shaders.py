@@ -369,6 +369,14 @@ _MAP_TYPE_CANONICAL: dict[str, str] = {
     "DisplacementMap": "Displacement",
 }
 
+# MTD-era sampler names used by the legacy 'GXFlver_*' shaders (trailing digits stripped before lookup). Their
+# specular texture is the '_r' reflectance map.
+_LEGACY_GX_MAP_TYPES: dict[str, str] = {
+    "g_DiffuseTexture": "Albedo",
+    "g_BumpmapTexture": "Normal",
+    "g_SpecularTexture": "Reflectance",
+}
+
 # Fallback regex patterns for specific complex sampler suffixes.
 _MAP_TYPE_FALLBACK_RE: dict[str, re.Pattern] = {
     "Fire_Mask": re.compile(r".*__Fire___Mask$"),
@@ -384,6 +392,10 @@ def extract_map_type(sampler_name: str) -> str:
     Returns a short canonical name like 'Albedo', 'Normal', 'Metallic', etc., or the raw extracted suffix if
     not recognized.
     """
+    # Legacy 'GXFlver_*' shaders (assets whose FLVER names an '.mtd', e.g. M[ARSN]) keep MTD-era sampler names.
+    if (legacy := _LEGACY_GX_MAP_TYPES.get(sampler_name.rstrip("0123456789"))) is not None:
+        return legacy
+
     m = _SAMPLER_MAP_TYPE_RE.match(sampler_name)
     if m:
         raw = m.group(1).lstrip("_")

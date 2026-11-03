@@ -537,16 +537,18 @@ class MergedMesh:
                                 f"consistent across their usage in FLVER meshes. (FLVER {flver_name})"
                             )
                             new_uv_array = np.zeros((total_vertex_count, mesh_uv_dim), dtype=np.float32)
-                            # Copy old array into new array. No need to copy past row `i`.
-                            new_uv_array[:i, :old_uv_dim] = uv_array
+                            # Copy the old columns (all rows: the old array is full length, so slicing it to `:i`
+                            # rows on one side only raised a broadcast error, e.g. Nightreign AEG001_290).
+                            new_uv_array[:, :old_uv_dim] = uv_array
                             uv_array = loops.uvs[uv_layer_name] = new_uv_array
                     else:
                         # First use of this UV layer name. Create loop array with zeroes.
                         new_uv_array = np.zeros((total_vertex_count, mesh_uv_dim), dtype=np.float32)
                         uv_array = loops.uvs[uv_layer_name] = new_uv_array
 
-                    # Write rows into (possibly just created or column-upgraded) UV array.
-                    uv_array[i:j] = mesh_uv_array
+                    # Write rows into (possibly just created or column-upgraded) UV array. A mesh may use fewer
+                    # columns than an earlier mesh's upgraded layer; its extra columns stay zero.
+                    uv_array[i:j, :mesh_uv_dim] = mesh_uv_array
 
         # NOTE: We don't sort `loop_uvs`. Their order shouldn't matter; the user can determine it, if needed.
 
