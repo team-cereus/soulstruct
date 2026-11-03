@@ -16,26 +16,23 @@ from soulstruct.utilities.misc import IDList
 from soulstruct.eldenring.maps.constants import get_map
 from .enums import *
 from soulstruct.eldenring.maps.events import *
-from .events import (
-    MSBMapOffsetEvent,
-    MSBPatrolInfoEvent,
-    MSBAutoDrawGroupEvent,
-    MSBBirdRouteEvent,
-    MSBTalkInfoEvent,
-    MSBTeamFightEvent,
-    MSBPseudoMultiplayerEvent,
-    MSBPlatoonInfoEvent,
-    MSBRidingEvent,
-    MSBSignPuddleEvent,
-)
+from .events import *  # NR event layouts override ER
 from soulstruct.eldenring.maps.models import *
 from .regions import *
 from soulstruct.eldenring.maps.routes import *
-from soulstruct.eldenring.maps.parts import *
+from .parts import *
 
 
 class MSBEntrySuperlistHeader(BinaryStruct):
+    # Written as 78. Routes/layers are 73 on disk; see `_FlexibleSupertypeHeader` for reads.
     _version: int = binary(asserted=78, init=False)
+    entry_offset_count: int
+    name_offset: long
+
+
+class _FlexibleSupertypeHeader(BinaryStruct):
+    """NR models/events/points/parts use 78; routes/layers still use 73."""
+    _version: int
     entry_offset_count: int
     name_offset: long
 
@@ -421,5 +418,28 @@ class MSB(_BaseMSB[MSBModel, MSBEvent, MSBRegion, MSBPart]):
     def new_c1000(self, name: str, **kwargs) -> MSBCharacter:
         """Useful to create basic c1000 instances as debug warp points."""
         return self.characters.new(name=name, model_name="c1000", **kwargs)
+
+    @classmethod
+    def _unpack_supertype_list(
+        cls,
+        reader: BinaryReader,
+        supertype_name: str,
+        entry_unpack_func: tp.Callable[[BinaryReader], None],
+    ) -> int:
+        """Like the base unpacker, but accept both version 78 and 73 list headers."""
+        offset_fmt = "q" if cls.LONG_VARINTS else "i"
+        supertype_list_header = _FlexibleSupertypeHeader.from_bytes(reader)
+        entry_offset_count = supertype_list_header.pop("entry_offset_count")
+        name_offset = supertype_list_header.pop("name_offset")
+
+        entry_offsets = list(reader.unpack(f"{entry_offset_count}{offset_fmt}"))
+        found_name = reader.unpack_string(offset=name_offset, encoding=cls.NAME_ENCODING)
+        if found_name != supertype_name:
+            raise ValueError(f"MSB internal supertype list name '{found_name}' != expected name '{supertype_name}'.")
+        for entry_offset in entry_offsets[:-1]:
+            reader.seek(entry_offset)
+            entry_unpack_func(reader)
+
+        return entry_offsets[-1]
 
     # endregion

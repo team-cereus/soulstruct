@@ -1,4 +1,6 @@
-import os
+"""Load a real Nightreign MSB after BHD5 AES decrypt (not UFdk ciphertext)."""
+from __future__ import annotations
+
 import tempfile
 import unittest
 from pathlib import Path
@@ -7,15 +9,13 @@ from soulstruct.dcx import DCXType
 from soulstruct.nightreign.maps import MSB
 from soulstruct.nightreign.maps import poi_map_pieces
 
-STAGING_MSB = Path(r"S:/_modding/tools/soulstruct-blender/_tmp/nr-full-unpack/map/mapstudio/m46_51_00_00.msb.dcx")
+from tests.nightreign._paths import find_msb, is_encrypted
+
+MSB_PATH = find_msb("m46_51_00_00", "m30_30_00_00")
 
 
-def _staging_available() -> bool:
-    return STAGING_MSB.is_file()
-
-
-def _is_ufdk_compressed(path: Path) -> bool:
-    return path.read_bytes()[:4] == b"UFdk"
+def _msb_available() -> bool:
+    return MSB_PATH is not None and MSB_PATH.is_file() and not is_encrypted(MSB_PATH)
 
 
 class NightreignMSBTest(unittest.TestCase):
@@ -35,18 +35,21 @@ class NightreignMSBTest(unittest.TestCase):
             for subtype in MSB.get_subtype_list_names():
                 self.assertEqual(len(msb[subtype]), len(reloaded[subtype]))
 
-    @unittest.skipUnless(_staging_available(), "staging MSB missing")
+    @unittest.skipUnless(_msb_available(), "decrypted NR MSB missing — run NrUnpackCli with ReadFileOrThrow")
     def test_load_staging_msb(self):
-        if _is_ufdk_compressed(STAGING_MSB):
-            self.skipTest("staging file uses UFdk compression (not yet supported by soulstruct.dcx)")
-        msb = MSB.from_path(STAGING_MSB)
-        self.assertTrue(len(msb.map_pieces) > 0 or len(msb.map_piece_models) > 0)
+        self.assertFalse(is_encrypted(MSB_PATH), f"{MSB_PATH} is still AES ciphertext (UFdk)")
+        magic = MSB_PATH.read_bytes()[:4]
+        self.assertIn(magic, {b"DCX\0", b"MSB "}, f"unexpected magic {magic!r} in {MSB_PATH}")
+        msb = MSB.from_path(MSB_PATH)
+        self.assertTrue(
+            len(msb.map_pieces) > 0 or len(msb.map_piece_models) > 0
+            or len(msb.assets) > 0 or len(msb.asset_models) > 0,
+            f"no map pieces or assets in {MSB_PATH}",
+        )
 
-    @unittest.skipUnless(_staging_available(), "staging MSB missing")
+    @unittest.skipUnless(_msb_available(), "decrypted NR MSB missing — run NrUnpackCli with ReadFileOrThrow")
     def test_staging_roundtrip(self):
-        if _is_ufdk_compressed(STAGING_MSB):
-            self.skipTest("staging file uses UFdk compression (not yet supported by soulstruct.dcx)")
-        msb = MSB.from_path(STAGING_MSB)
+        msb = MSB.from_path(MSB_PATH)
         msb.dcx_type = DCXType.Null
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "roundtrip.msb"
@@ -55,11 +58,9 @@ class NightreignMSBTest(unittest.TestCase):
             for subtype in MSB.get_subtype_list_names():
                 self.assertEqual(len(msb[subtype]), len(reloaded[subtype]))
 
-    @unittest.skipUnless(_staging_available(), "staging MSB missing")
+    @unittest.skipUnless(_msb_available(), "decrypted NR MSB missing — run NrUnpackCli with ReadFileOrThrow")
     def test_small_base_attach_if_present(self):
-        if _is_ufdk_compressed(STAGING_MSB):
-            self.skipTest("staging file uses UFdk compression (not yet supported by soulstruct.dcx)")
-        msb = MSB.from_path(STAGING_MSB)
+        msb = MSB.from_path(MSB_PATH)
         if not msb.small_base_attachs:
             self.skipTest("no SmallBaseAttach regions in this map")
         region = msb.small_base_attachs[0]

@@ -34,9 +34,26 @@ def find_msb_path(game_root: Path, map_stem: str) -> Path | None:
 
 
 def iter_map_piece_instances(msb: MSB) -> list[tuple[str, tp.Any, tp.Any, tp.Any]]:
-    """Return ``(model_name, translate, rotate, scale)`` for each map piece part."""
+    """Return ``(model_name, translate, rotate, scale)`` for map pieces and assets.
+
+    Nightreign overworld tiles are mostly AEG assets, not ``map_pieces``.
+    """
     out: list[tuple[str, tp.Any, tp.Any, tp.Any]] = []
-    for piece in msb.map_pieces:
-        model_name = piece.model.name if piece.model else ""
+    for piece in list(msb.map_pieces) + list(msb.assets):
+        model = getattr(piece, "model", None)
+        model_name = model.name if model else ""
         out.append((model_name, piece.translate, piece.rotate, piece.scale))
     return out
+
+
+def unique_aeg_model_names(msb: MSB) -> list[str]:
+    """Return unique AEG model names used by map pieces and assets, in first-seen order."""
+    seen: set[str] = set()
+    names: list[str] = []
+    for model_name, _translate, _rotate, _scale in iter_map_piece_instances(msb):
+        if not model_name or not model_name.upper().startswith("AEG"):
+            continue
+        if model_name not in seen:
+            seen.add(model_name)
+            names.append(model_name)
+    return names
