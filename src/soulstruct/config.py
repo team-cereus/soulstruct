@@ -24,6 +24,7 @@ __all__ = [
 import dataclasses
 import json
 import logging
+import os
 import sys
 import typing as tp
 from dataclasses import dataclass, field
@@ -40,6 +41,11 @@ def _get_json_path() -> Path:
     if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
         return Path(sys.executable).parent / "soulstruct_config.json"
     return _SOULSTRUCT_APPDATA / "soulstruct_config.json"
+
+
+def _is_blank_config(text: str) -> bool:
+    """An interrupted write (crash, power loss) can leave the file empty or zero-filled on Windows."""
+    return not text.strip("\x00 \t\r\n")
 
 
 @dataclass
@@ -124,15 +130,18 @@ class SoulstructConfig:
                 )
             return  # use defaults
 
-        with _json_path.open("r") as fp:
-            try:
-                data = json.load(fp)
-            except json.JSONDecodeError as ex:
-                raise json.JSONDecodeError(
-                    f"Error while loading 'soulstruct_config.json': {ex.msg}",
-                    "soulstruct_config.json",
-                    ex.lineno,
-                )
+        text = _json_path.read_text()
+        if _is_blank_config(text):
+            _LOGGER.warning(f"Ignoring empty or zero-filled '{_json_path}' and using default settings.")
+            return
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError as ex:
+            raise json.JSONDecodeError(
+                f"Error while loading 'soulstruct_config.json': {ex.msg}",
+                "soulstruct_config.json",
+                ex.lineno,
+            )
 
         # Handle legacy key renames.
         if "ELDEN_RING_PATH" in data and "ER_PATH" not in data:
@@ -153,8 +162,13 @@ class SoulstructConfig:
         """Write this instance to ``soulstruct_config.json``."""
         _json_path = _get_json_path()
         _json_path.parent.mkdir(parents=True, exist_ok=True)
-        with _json_path.open("w") as fp:
+        # Write a temp file and swap it in, so a crash mid-write cannot leave a zero-filled config behind.
+        tmp_path = _json_path.with_name(_json_path.name + ".tmp")
+        with tmp_path.open("w") as fp:
             json.dump(self.to_dict(), fp, indent=4)
+            fp.flush()
+            os.fsync(fp.fileno())
+        os.replace(tmp_path, _json_path)
 
     def update(self, **kwargs: tp.Any) -> None:
         """Update one or more fields by name and save."""
@@ -199,12 +213,11 @@ except FileNotFoundError:
     Config.save()
     Config.load()
 else:
-    # If the on-disk file is missing any keys, rewrite it with full defaults.
+    # If the on-disk file is missing any keys (or is blank after an interrupted write), rewrite it with full defaults.
     json_path = _get_json_path()
     if json_path.exists():
-        with json_path.open("r") as _fp:
-            _on_disk = json.load(_fp)
-        if len(_on_disk) != len(dataclasses.fields(SoulstructConfig)):
+        _text = json_path.read_text()
+        if _is_blank_config(_text) or len(json.loads(_text)) != len(dataclasses.fields(SoulstructConfig)):
             Config.save()
 
 
