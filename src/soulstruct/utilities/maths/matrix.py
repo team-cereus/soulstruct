@@ -11,11 +11,11 @@ from .euler import BaseEuler, EulerDeg, EulerRad, EULER_DEG_LIKE, EULER_RAD_LIKE
 from .vector import Vector3, Vector4
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class Matrix3:
     """Basic wrapper for 3x3 `np.ndarray` that can be constructed from various input types."""
 
-    _data: np.ndarray = field(default_factory=lambda: np.zeros((3, 3), dtype=float))
+    _data: np.ndarray
 
     def __init__(self, data: np.ndarray | list | tuple):
         """Construct `Matrix3` from an existing `ndarray` or a input that can be converted to a 3x3 `np.ndarray`."""
@@ -62,6 +62,11 @@ class Matrix3:
         """Return the inverse of this matrix."""
         return Matrix3(np.linalg.inv(self._data))
 
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, Matrix3):
+            return NotImplemented
+        return np.array_equal(self._data, value._data)
+
     def __matmul__(self, other: Matrix3 | Vector3 | BaseEuler | np.ndarray):
         """Multiply a matrix, vector, or Euler angles by this matrix, returning the appropriate type."""
         if isinstance(other, Matrix3):
@@ -76,19 +81,6 @@ class Matrix3:
         if other.ndim == 1:
             return Vector3(np.matmul(self._data, other))
         return Matrix3(np.matmul(self._data, other))
-
-    def __rmatmul__(self, other: Matrix3 | Vector3 | BaseEuler | np.ndarray):
-        """Multiply a matrix, vector, or Euler angles by this matrix, returning the appropriate type."""
-        if isinstance(other, Matrix3):
-            return Matrix3(np.matmul(other._data, self._data))
-        elif isinstance(other, EulerDeg):
-            return (Matrix3.from_euler_angles_deg(other) @ self).to_euler_angles_deg()
-        elif isinstance(other, EulerRad):
-            return (Matrix3.from_euler_angles_rad(other) @ self).to_euler_angles_rad()
-        elif isinstance(other, Vector3):
-            return Vector3(np.inner(other._data, self._data))
-        # Assume array-like.
-        return Matrix3(np.matmul(other, self._data))
 
     def __neg__(self):
         return self.__class__(-self._data)
@@ -133,7 +125,7 @@ class Matrix3:
     @classmethod
     def from_euler_angles_deg(cls, euler_xyz: EULER_DEG_LIKE, order="xzy") -> Matrix3:
         """Order defaults to XZY as per FromSoft usage (i.e. will be applied to point `p` as `Ry @ Rz @ Rx @ p`)."""
-        return cls.from_euler_angles_rad(euler_xyz.to_rad(), order=order)
+        return cls.from_euler_angles_rad(EulerDeg(euler_xyz).to_rad(), order=order)
 
     def to_euler_angles_rad(self, order="xzy") -> EulerRad:
         """Only supports order XZY for now (standard FromSoft usage)."""
@@ -198,11 +190,11 @@ class Matrix3:
         ], dtype=float))
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class Matrix4:
     """Basic wrapper for 3x3 `np.ndarray` that can be constructed from various input types."""
 
-    _data: np.ndarray = field(default_factory=lambda: np.zeros((4, 4), dtype=float))
+    _data: np.ndarray
 
     def __init__(self, data: np.ndarray | list | tuple):
         """Construct `Matrix4` from an existing `ndarray` or a input that can be converted to a 4x4 `np.ndarray`."""
@@ -249,6 +241,11 @@ class Matrix4:
         """Return the inverse of this matrix."""
         return Matrix4(np.linalg.inv(self._data))
 
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, Matrix4):
+            return NotImplemented
+        return np.array_equal(self._data, value._data)
+
     def __matmul__(self, other: Matrix4 | Vector4 | Vector3 | np.ndarray):
         if isinstance(other, Matrix4):
             return Matrix4(np.matmul(self._data, other._data))
@@ -258,16 +255,6 @@ class Matrix4:
             return Vector4(np.inner(self._data, other._data))
         # Assume array-like.
         return Matrix4(np.matmul(self._data, other))
-
-    def __rmatmul__(self, other: Matrix4 | Vector4 | Vector3 | np.ndarray):
-        if isinstance(other, Matrix4):
-            return Matrix4(np.matmul(other._data, self._data))
-        elif isinstance(other, Vector3):
-            return Vector3(np.inner((other.x, other.y, other.z, 1.0), self._data)[:3])
-        elif isinstance(other, Vector4):
-            return Vector4(np.inner(other._data, self._data))
-        # Assume array-like.
-        return Matrix4(np.matmul(other, self._data))
 
     def __neg__(self):
         return self.__class__(-self._data)

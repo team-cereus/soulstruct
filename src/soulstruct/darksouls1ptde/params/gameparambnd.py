@@ -22,7 +22,7 @@ if tp.TYPE_CHECKING:
 
 class GameParamBND(_BaseGameParamBND):
 
-    DEFAULT_ENTRY_ROOT: tp.ClassVar[str] = "N:\\FRPG\\data\\Param\\GameParam"
+    DEFAULT_ENTRY_ROOT: tp.ClassVar[str] = f"{DARK_SOULS_PTDE.interroot_prefix}\\param\\GameParam"
 
     PARAMDEF_MODULE: tp.ClassVar = paramdef
 
@@ -67,9 +67,7 @@ class GameParamBND(_BaseGameParamBND):
         ("ThrowParam", "Throws"),
     )
 
-    dcx_type = DARK_SOULS_PTDE.default_dcx_type
     version: BinderVersion = BinderVersion.V3
-    v4_info = None
 
     AI = param_property("NpcThinkParam")  # type: Param[NPC_THINK_PARAM_ST]
     Armor = param_property("EquipParamProtector")  # type: Param[EQUIP_PARAM_PROTECTOR_ST]

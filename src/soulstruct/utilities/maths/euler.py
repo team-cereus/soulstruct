@@ -38,7 +38,6 @@ class BaseEuler(abc.ABC):
 
     __array_priority__ = 1000  # for numpy array operations
     _RE_FROM_REPR: tp.ClassVar[re.Pattern] = re.compile(r"^(\w+)\((.+)\)$")  # e.g. "EulerDeg(1, 2, 3)"
-    REPR_PRECISION: tp.ClassVar[int] = 5
     ORDER = "XZY"
 
     _data: np.ndarray
@@ -49,7 +48,7 @@ class BaseEuler(abc.ABC):
         if isinstance(data, self.__class__):
             arr = data._data.copy()
         else:
-            arr = np.asarray(data, dtype=float)
+            arr = np.array(data, dtype=float)  # copy
         object.__setattr__(self, "_data", arr)
 
     def __array__(self, dtype=None):
@@ -101,7 +100,8 @@ class BaseEuler(abc.ABC):
             elif x == SINGLE_MAX:
                 elements.append("<SINGLE_MAX>")
             else:
-                elements.append(f"{x:.{self.REPR_PRECISION}}")
+                # `repr()` of a Python float always round-trips exactly.
+                elements.append(repr(float(x)))
         return f"{self.__class__.__name__}(({', '.join(elements)}))"
 
     def __hash__(self) -> int:

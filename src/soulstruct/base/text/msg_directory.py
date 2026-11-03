@@ -14,6 +14,7 @@ from soulstruct.containers import Binder, BinderEntry
 from soulstruct.dcx import DCXType
 from soulstruct.base.game_file_directory import GameFileDirectory
 from soulstruct.utilities.files import read_json, write_json
+from soulstruct.utilities.progress import ProgressCallback, report_progress
 
 from .fmg import FMG
 
@@ -39,12 +40,12 @@ class MSGDirectory(GameFileDirectory, abc.ABC):
 
     # Maps "item/menu" string and entry IDs to default entry names (without paths) to use when generating new FMG binder
     # entries from scratch.
-    DEFAULT_ENTRY_STEMS: tp.ClassVar[dict[(str, int), str]]
+    DEFAULT_ENTRY_STEMS: tp.ClassVar[dict[tuple[str, int], str]]
 
     # Maps any non-patch ('base') FMG entry sources/IDs to patch FMG entry sources/IDs.
     # When `merge_base_and_patch()` is called, all base and patch FMGs will be merged (with 'patch' taking precedence in
     # case of conflicts) and the results written to BOTH base and patch.
-    BASE_PATCH_FMGS: tp.ClassVar[dict[(str, int), (str, int)]] = {}
+    BASE_PATCH_FMGS: tp.ClassVar[dict[tuple[str, int], tuple[str, int]]] = {}
 
     # DCX compression type to use for `FMG` entries (as `FMG` does not have game-specific subclasses). Typically Null.
     FMG_DCX_TYPE: tp.ClassVar[DCXType] = DCXType.Null
@@ -53,7 +54,7 @@ class MSGDirectory(GameFileDirectory, abc.ABC):
     files: dict[str, Binder] = field(default_factory=dict)  # maps 'true stems' to `FILE_CLASS` instances
 
     # Maps "item/menu" string and entry IDs to FMGs (unusual for IDs to matter, but they do in MSGBNDs).
-    fmgs: dict[(str, int), FMG] = field(default_factory=dict)
+    fmgs: dict[tuple[str, int], FMG] = field(default_factory=dict)
 
     @classmethod
     def GET_ALL_CATEGORIES(cls):
@@ -92,7 +93,7 @@ class MSGDirectory(GameFileDirectory, abc.ABC):
         return cls(directory=None, files=files, fmgs=fmgs)
 
     @classmethod
-    def from_json_directory(cls, directory: Path | str) -> tp.Self:
+    def from_json_directory(cls, directory: Path | str, progress: ProgressCallback | None = None) -> tp.Self:
         """Load individual text (FMG) JSON files from an unpacked Binder folder (e.g. from `write_json_directory()`).
 
         The names of the JSON files to be loaded from the folder are recorded in the "entries" key of the
@@ -117,10 +118,14 @@ class MSGDirectory(GameFileDirectory, abc.ABC):
         menu_kwargs = cls.FILE_CLASS.process_manifest_header(menu_manifest)
 
         missing_ids = list(cls.DEFAULT_ENTRY_STEMS)
+        total = sum(len(kwargs.get("entries", {})) for kwargs in (item_kwargs, menu_kwargs))
+        done = 0
         for msgbnd_name, kwargs in zip(("item", "menu"), (item_kwargs, menu_kwargs)):
             entries = []
             entry_json_dict = kwargs.pop("entries", {})
             for entry_id, json_stem in entry_json_dict.items():
+                report_progress(progress, done, total, json_stem)
+                done += 1
                 entry_id = int(entry_id)
                 json_name = f"{json_stem}.json"
                 if (msgbnd_name, entry_id) not in cls.DEFAULT_ENTRY_STEMS:
@@ -145,10 +150,11 @@ class MSGDirectory(GameFileDirectory, abc.ABC):
             missing = f"\n  ".join(f"{entry_id}: {cls.DEFAULT_ENTRY_STEMS[entry_id]}" for entry_id in missing_ids)
             _LOGGER.warning(f"Could not find these MSGBND entry IDs in JSON directory:\n  {missing}")
 
+        report_progress(progress, total, total, "")
         return cls(directory=directory, files=files, fmgs=fmgs)
 
     @classmethod
-    def create_fmgs(cls, item_msgbnd: Binder, menu_msgbnd: Binder) -> dict[(str, int), FMG]:
+    def create_fmgs(cls, item_msgbnd: Binder, menu_msgbnd: Binder) -> dict[tuple[str, int], FMG]:
         """Loads FMGs from given `msgbnd` into `categories` dictionary."""
         fmgs = {}
         for entry in item_msgbnd.entries:
@@ -165,7 +171,7 @@ class MSGDirectory(GameFileDirectory, abc.ABC):
                 raise
         return fmgs
 
-    def write_json_directory(self, directory: Path | str):
+    def write_json_directory(self, directory: Path | str, progress: ProgressCallback | None = None):
         """Write a folder containing custom MSGBND manifests linking to FMG JSON entry files.
 
         The resulting folder can be loaded with `from_json_directory(directory)`.
@@ -187,12 +193,14 @@ class MSGDirectory(GameFileDirectory, abc.ABC):
 
         category_fmgs = self.get_matching_fmgs()
 
-        for (msgbnd_name, entry_id), fmg in self.fmgs.items():
+        for i, (((msgbnd_name, entry_id), fmg)) in enumerate(self.fmgs.items()):
             # TODO: Clunky way to get Soulstruct category name...
             category_name = [key for key, _fmg in category_fmgs.items() if _fmg is fmg][0]
+            report_progress(progress, i, len(self.fmgs), category_name)
             manifests[msgbnd_name]["entries"][entry_id] = category_name
             fmg.write_json(directory / f"{category_name}.json", encoding="utf-8")
 
+        report_progress(progress, len(self.fmgs), len(self.fmgs), "")
         write_json(directory / "item_msgbnd_manifest.json", manifests["item"])
         write_json(directory / "menu_msgbnd_manifest.json", manifests["menu"])
 
@@ -203,7 +211,7 @@ class MSGDirectory(GameFileDirectory, abc.ABC):
         fmg_keys = self.fmgs.keys()
         for msgbnd_name in ("item", "menu"):
             msgbnd = self.files[msgbnd_name]
-            for entry in msgbnd.entries:
+            for entry in tuple(msgbnd.entries):
                 if (msgbnd_name, entry.entry_id) not in fmg_keys:
                     msgbnd.remove_entry(entry)
 
@@ -247,7 +255,7 @@ class MSGDirectory(GameFileDirectory, abc.ABC):
         for attr_name in dir(self.__class__):
             if (
                 isinstance(getattr(self.__class__, attr_name), property)
-                and (not category_name_regex or re.match(category_name_regex, attr_name))
+                and (not category_name_regex or re.fullmatch(category_name_regex, attr_name))
             ):
                 fmgs[attr_name] = getattr(self, attr_name)
         return fmgs
@@ -284,11 +292,15 @@ class MSGDirectory(GameFileDirectory, abc.ABC):
         for fmg in self.get_matching_fmgs(category_name_regex).values():
             fmg.entries = {
                 string_id: string.replace(old_substring, new_substring)
-                for string_id, string in fmg.entries
+                for string_id, string in fmg.entries.items()
             }
 
     def write(
-        self, directory_path: Path | str | None = None, check_file_hashes=False, no_partial_write=True
+        self,
+        directory_path: Path | str | None = None,
+        force=False,
+        no_partial_write=True,
+        progress: ProgressCallback | None = None,
     ) -> list[Path]:
         """Regenerate and write `item` and `menu` MSGBNDs."""
         if directory_path is None:
@@ -304,29 +316,30 @@ class MSGDirectory(GameFileDirectory, abc.ABC):
             directory_path / f"menu{self.FILE_EXTENSION}": self.files["menu"],
         }
 
-        written_paths = self._write(file_paths, check_file_hashes, no_partial_write)
+        written_paths = self._write(file_paths, force, no_partial_write, progress=progress)
         self._log_directory_write(directory_path, len(written_paths))
         return written_paths
 
     # region Utility Methods: Items
 
-    def get_item_fmgs(self, item_type: str) -> dict[str, FMG]:
+    def get_item_fmgs(self, item_type: str, patch: bool = False) -> dict[str, FMG]:
         """Return a dictionary with keys 'Names', 'Summaries', and 'Descriptions' mapping to the FMGs of `item_type`
         and that key text type (e.g. 'WeaponDescriptions').
 
         Will raise a `KeyError` if any of the three text categories are missing.
         """
         item_type = self.resolve_item_type(item_type)
-        item_fmgs = self.get_matching_fmgs(re.compile(rf"{item_type}(Names|Summaries|Descriptions)"))
+        suffix = "Patch" if patch else ""
+        item_fmgs = self.get_matching_fmgs(re.compile(rf"{item_type}(Names|Summaries|Descriptions){suffix}"))
         if len(item_fmgs) != 3:
             raise KeyError(
-                f"Could not find all of '{item_type}Names', '{item_type}Summaries', and '{item_type}Descriptions' "
-                f"in `MSGDirectory`."
+                f"Could not find all of '{item_type}Names{suffix}', '{item_type}Summaries{suffix}', and "
+                f"'{item_type}Descriptions{suffix}' in `MSGDirectory`."
             )
         return {
-            "Names": item_fmgs[f"{item_type}Names"],
-            "Summaries": item_fmgs[f"{item_type}Summaries"],
-            "Descriptions": item_fmgs[f"{item_type}Descriptions"],
+            f"Names{suffix}": item_fmgs[f"{item_type}Names{suffix}"],
+            f"Summaries{suffix}": item_fmgs[f"{item_type}Summaries{suffix}"],
+            f"Descriptions{suffix}": item_fmgs[f"{item_type}Descriptions{suffix}"],
         }
 
     def get_all_item_text(self, item_id: int, item_type: str) -> dict[str, str]:

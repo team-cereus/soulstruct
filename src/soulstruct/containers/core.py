@@ -4,6 +4,7 @@ __all__ = [
     "BinderFlags",
     "BinderError",
     "EntryNotFoundError",
+    "MultipleEntriesFoundError",
     "BinderVersion",
     "BinderHeaderV3",
     "BinderHeaderV4",
@@ -23,7 +24,7 @@ from dataclasses import dataclass, field
 from soulstruct.base.base_binary_file import BaseBinaryFile
 from soulstruct.dcx import DCXType, compress, decompress
 from soulstruct.utilities.binary import *
-from soulstruct.utilities.files import read_json, write_json, get_blake2b_hash
+from soulstruct.utilities.files import read_json, write_json, write_data_to_path
 
 from .binder_hash import BinderHashTable
 from .entry import BinderEntry, BinderEntryHeader
@@ -146,7 +147,7 @@ class BinderHeaderV3(BinaryStruct):
     bit_big_endian: bool
     _pad1: bytes = binary_pad(1, init=False)
     entry_count: int
-    file_size: int
+    file_headers_end: int
     _pad2: bytes = binary_pad(8, init=False)
 
 
@@ -159,7 +160,7 @@ class BinderHeaderV4(BinaryStruct):
     bit_little_endian: bool
     _pad2: bytes = binary_pad(1, init=False)
     entry_count: int
-    # NOTE: No `file_size` in V4.
+    # NOTE: No `file_headers_end` in V4.
     _header_size: long = binary(asserted=0x40, init=False)
     signature: str = binary_string(8, encoding="ascii", rstrip_null=True)
     _entry_header_size: long
@@ -513,6 +514,8 @@ class Binder(BaseBinaryFile):
                 f"containing one."
             )
         manifest = read_json(manifest_path, encoding="shift-jis")
+        if not isinstance(manifest, dict):
+            raise ValueError("Binder manifest JSON top-level object must be a dictionary.")
         manifest = cls.process_manifest_header(manifest)
 
         # 'entries' is a dictionary mapping entry path roots to either (a) entry dictionaries containing 'flags', 'id',
@@ -538,6 +541,7 @@ class Binder(BaseBinaryFile):
         for required_key in ("binder_type", "signature", "flags", "big_endian", "bit_big_endian"):
             if required_key not in binder_kwargs:
                 raise BinderError(f"Binder manifest JSON file does not contain '{required_key}' key.")
+        # NOTE: `dcx_type` key can be omitted and will default to `DCXType.Null` (no compression).
 
         binder_type = binder_kwargs.pop("binder_type")
         if binder_type[:3] == "BXF":
@@ -561,7 +565,7 @@ class Binder(BaseBinaryFile):
         binder_kwargs["is_split_bxf"] = is_split_bxf
         binder_kwargs["version"] = version
         binder_kwargs["flags"] = BinderFlags(manifest["flags"])
-        binder_kwargs["dcx_type"] = DCXType[manifest["dcx_type"]]
+        binder_kwargs["dcx_type"] = DCXType[manifest["dcx_type"]] if "dcx_type" in manifest else DCXType.Null
 
         if version == BinderVersion.V4:
             # Read V4-specific info.
@@ -628,7 +632,7 @@ class Binder(BaseBinaryFile):
         file_path: None | str | Path = None,
         bdt_file_path: None | str | Path = None,
         make_dirs=True,
-        check_hash=False,
+        force=False,
     ) -> list[Path]:
         """Writes the `BND` file, or writes both the `BHD` and `BDT` files at once for split binders.
 
@@ -644,8 +648,7 @@ class Binder(BaseBinaryFile):
             bdt_file_path (None, str, Path): file path to write `BDT` to. Defaults to `file_path` with "bdt"
                 replacing "bhd" in any and all file suffixes.
             make_dirs (bool): if True, any absent directories in both `file_path` and `bdt_file_path` will be created.
-            check_hash (bool): if True, files will not be written if both BHD and BDT files with same hashes already
-                exist. (Default: False)
+            force (bool): if True, files will be written even if identical to existing. (Default: False)
 
         Returns:
             list[Path]: path of written BND file or BHD and BDT files. Empty if nothing new is written.
@@ -656,7 +659,7 @@ class Binder(BaseBinaryFile):
 
         if self.is_split_bxf:
             if self.IS_SPLIT_BXF is False:
-                raise ValueError(f"Cannot write split BHD/BDT Binder for class `{self.__name__}`.")
+                raise ValueError(f"Cannot write split BHD/BDT Binder for class `{self.cls_name}`.")
             if bdt_file_path is None:
                 # Auto-set BDT path.
                 name_parts = file_path.name.split(".")
@@ -667,35 +670,27 @@ class Binder(BaseBinaryFile):
                 if make_dirs:  # only needed if not next to BHD file (as will be the case above)
                     bdt_file_path.parent.mkdir(parents=True, exist_ok=True)
             packed_bhd, packed_bdt = self.get_split_bytes()
-            if check_hash and file_path.is_file() and bdt_file_path.is_file():
-                bhd_match = get_blake2b_hash(file_path) == get_blake2b_hash(packed_bhd)
-                bdt_match = get_blake2b_hash(bdt_file_path) == get_blake2b_hash(packed_bdt)
-                if bhd_match and bdt_match:
-                    return []  # don't write files (both match)
-            self.create_bak(file_path, make_dirs=make_dirs)
-            self.create_bak(bdt_file_path, make_dirs=make_dirs)
-            with file_path.open("wb") as f:
-                f.write(packed_bhd)
-            with bdt_file_path.open("wb") as f:
-                f.write(packed_bdt)
-            return [file_path, bdt_file_path]
+            written_paths = []
+            if write_data_to_path(packed_bhd, file_path, force=force):
+                written_paths.append(file_path)
+            if write_data_to_path(packed_bdt, bdt_file_path, force=force):
+                written_paths.append(bdt_file_path)
+            return written_paths
 
         if bdt_file_path is not None:
             raise ValueError("Cannot pass in `bdt_file_path` when `Binder.is_split_bxf == False`.")
 
-        if self.IS_SPLIT_BXF is True:
-            raise ValueError(f"Can only write split BHD/BDT Binder for class `{self.__name__}`.")
+        if self.IS_SPLIT_BXF:
+            raise ValueError(f"Can only write split BHD/BDT Binder for class `{self.cls_name}`.")
 
-        super(Binder, self).write(file_path, make_dirs=make_dirs, check_hash=check_hash)
-
-        return [file_path]
+        return super(Binder, self).write(file_path, make_dirs=make_dirs, force=force)
 
     def write_split(
         self,
         bhd_path_or_entry: None | str | Path | BinderEntry,
         bdt_path_or_entry: None | str | Path | BinderEntry,
         make_dirs=True,
-        check_hash=False,
+        force=False,
     ) -> None:
         """Writes both the `BHD` and `BDT` files at once, but also supports writing their data into an existing
         `BinderEntry`. Most useful for split 'CHRTPFBHD/BDT' files in `chr` folders, where the BHD header file is
@@ -713,25 +708,14 @@ class Binder(BaseBinaryFile):
             bhd_path_or_entry (None, str, Path, BinderEntry): file path or `BinderEntry` to write `BHD` to.
             bdt_path_or_entry (None, str, Path, BinderEntry): file path or `BinderEntry` to write `BDT` to.
             make_dirs (bool): if True, any absent directories in either path will be created.
-            check_hash (bool): if True, files will not be written if both BHD and BDT files with same hashes already
-                exist. (Default: False)
+            force (bool): if True, files will be written even existing files are identical. (Default: False)
         """
 
         packed_bhd, packed_bdt = self.get_split_bytes()
 
         for path_or_entry, packed in zip((bhd_path_or_entry, bdt_path_or_entry), (packed_bhd, packed_bdt)):
             if isinstance(path_or_entry, (str, Path)):
-                path_or_entry = Path(path_or_entry)
-                if make_dirs:
-                    path_or_entry.parent.mkdir(parents=True, exist_ok=True)
-                if check_hash and path_or_entry.is_file():
-                    bhd_match = get_blake2b_hash(path_or_entry) == get_blake2b_hash(packed)
-                    if not bhd_match:
-                        self.create_bak(path_or_entry, make_dirs=make_dirs)
-                        path_or_entry.write_bytes(packed)
-                else:
-                    self.create_bak(path_or_entry, make_dirs=make_dirs)
-                    path_or_entry.write_bytes(packed)
+                write_data_to_path(packed, path_or_entry, force=force, make_dirs=make_dirs)
             elif isinstance(path_or_entry, BinderEntry):
                 path_or_entry.set_uncompressed_data(packed)
 
@@ -755,9 +739,10 @@ class Binder(BaseBinaryFile):
         bhd_writer, bdt_writer = self._to_split_writers()
         packed_bhd = bytes(bhd_writer)
         packed_bdt = bytes(bdt_writer)
-        if self.dcx_type != DCXType.Null:
-            packed_bhd = compress(packed_bhd, self.dcx_type)
-            packed_bdt = compress(packed_bdt, self.dcx_type)
+        dcx_type = self._get_dcx_type()
+        if dcx_type != DCXType.Null:
+            packed_bhd = compress(packed_bhd, dcx_type)
+            packed_bdt = compress(packed_bdt, dcx_type)
         return packed_bhd, packed_bdt
 
     def to_writer(self) -> BinaryWriter:
@@ -773,12 +758,11 @@ class Binder(BaseBinaryFile):
         if self.version == BinderVersion.V3:
             writer = self._header_to_writer_v3()
             self._entries_into_writer_v3(writer, writer)
-            writer.fill_with_position("file_size", obj=self)
         elif self.version == BinderVersion.V4:
             writer = self._header_to_writer_v4()
             rebuild_hash_table = self._check_v4_hash_table() if self.v4_info.hash_table_type == 4 else False
             self._entries_into_writer_v4(writer, writer, rebuild_hash_table)
-            # No 'file_size' field in V4.
+            # No 'file_headers_end' field in V4.
         else:
             raise ValueError(f"Cannot pack BND version: {self.version}")
 
@@ -793,17 +777,21 @@ class Binder(BaseBinaryFile):
         if self.version == BinderVersion.V3:
             header_writer = self._header_to_writer_v3()
             entry_writer = BDTHeaderV3.object_to_writer(self, byte_order=header_writer.byte_order)
-            self._entries_into_writer_v3(header_writer, entry_writer)
+            self._entries_into_writer_v3(header_writer, entry_writer, is_split=True)
         elif self.version == BinderVersion.V4:
+            if self.v4_info is None:
+                raise ValueError("Binder V4 must have `v4_info` set.")
             header_writer = self._header_to_writer_v4()
             rebuild_hash_table = self._check_v4_hash_table() if self.v4_info.hash_table_type == 4 else False
-            entry_writer = BDTHeaderV4.object_to_writer(self, byte_order=header_writer.byte_order)
+            entry_writer = BDTHeaderV4.object_to_writer(
+                self,
+                unknown1=self.v4_info.unknown1,
+                unknown2=self.v4_info.unknown2,
+                bit_little_endian=not self.bit_big_endian,  # REVERSED
+                byte_order=header_writer.byte_order)
             self._entries_into_writer_v4(header_writer, entry_writer, rebuild_hash_table)
         else:
             raise ValueError(f"Cannot pack BND version: {self.version}")
-
-        # File size is zero for BXF.
-        header_writer.fill("file_size", 0, obj=self)
 
         return header_writer, entry_writer
 
@@ -817,10 +805,10 @@ class Binder(BaseBinaryFile):
             big_endian=self.big_endian,
             bit_big_endian=self.bit_big_endian,
             entry_count=len(self.entries),
-            file_size=RESERVED,
+            file_headers_end=RESERVED,
         ).to_writer(writer, reserve_obj=self)
 
-    def _entries_into_writer_v3(self, header_writer: BinaryWriter, entry_writer: BinaryWriter):
+    def _entries_into_writer_v3(self, header_writer: BinaryWriter, entry_writer: BinaryWriter, is_split=False):
         """Write entries into given `entry_writer` and fill offsets in `header_writer`.
 
         NOTE: Both writers should be the same for BND files.
@@ -835,6 +823,9 @@ class Binder(BaseBinaryFile):
             for entry, entry_header in zip(sorted_entries, sorted_entry_headers):
                 packed_path = entry.get_packed_path(encoding=self.ENTRY_PATH_ENCODING)
                 entry_header.pack_path(header_writer, packed_path)
+
+        # This field is zero at the end of split headers.
+        header_writer.fill("file_headers_end", 0 if is_split else header_writer.position, obj=self)
 
         for entry, entry_header in zip(sorted_entries, sorted_entry_headers):
             entry_writer.pad_align(16)
@@ -938,7 +929,7 @@ class Binder(BaseBinaryFile):
         # Final keys (more metadata than real binder data).
         manifest |= {
             "use_id_prefix": self.has_repeated_entry_names,
-            "dcx_type": self.dcx_type.name,
+            "dcx_type": self._get_dcx_type().name,
         }
         return manifest
 
@@ -987,7 +978,7 @@ class Binder(BaseBinaryFile):
         json_dict["entries"] = entry_tree_dict
 
         # NOTE: Binder manifest is always encoded in shift-JIS, not `shift_jis_2004`.
-        write_json(directory / "binder_manifest.json", json_dict, encoding="shift-jis")
+        write_json(directory / self.MANIFEST_NAME, json_dict, encoding="shift-jis")
 
     def to_dict(self) -> dict:
         raise TypeError("Base `Binder` cannot be written to dictionary. Use `write_unpacked_directory()` instead.")
@@ -1053,7 +1044,7 @@ class Binder(BaseBinaryFile):
     def add_entry(self, entry: BinderEntry, ignore_id_conflict=False):
         if id(entry) in {id(e) for e in self.entries}:
             raise BinderError(f"Given `BinderEntry` instance with object ID {entry.entry_id} is already in Binder.")
-        if not ignore_id_conflict and entry.entry_id in {e.id for e in self.entries}:
+        if not ignore_id_conflict and entry.entry_id in {e.entry_id for e in self.entries}:
             _LOGGER.warning(
                 f"Entry ID {entry.entry_id} appears more than once in this Binder. Entry still added, but you should "
                 f"fix this."
@@ -1070,13 +1061,13 @@ class Binder(BaseBinaryFile):
 
     def add_or_replace_entry_with_id(self, entry: BinderEntry):
         """Add or replace an entry with the same ID. ID must be unique in the Binder, unlike name-based replacement."""
-        entries_by_id = self.get_entries_by_name()
+        entries_by_id = self.get_entries_by_id()
         if entry.entry_id in entries_by_id:
-            existing_entry = entries_by_id[entry.name]
+            existing_entry = entries_by_id[entry.entry_id]
             self.entries.remove(existing_entry)
         self.entries.append(entry)
 
-    def __or__(self, other: Binder | list[BinderEntry]):
+    def __ior__(self, other: Binder | list[BinderEntry]) -> tp.Self:
         """Add all entries from another `Binder` or list of `BinderEntry`s to this `Binder`, replacing any entries
         with the same name."""
         if isinstance(other, Binder):
@@ -1121,10 +1112,10 @@ class Binder(BaseBinaryFile):
     def create_default_entry(
         self,
         entry_data: bytes | BaseBinaryFile,
-        entry_id: int = None,
-        entry_name: str = None,
-        entry_path: str | Path = None,
-        entry_flags: int = None,
+        entry_id: int | None = None,
+        entry_name: str | None = None,
+        entry_path: str | Path | None = None,
+        entry_flags: int | None = None,
     ) -> BinderEntry:
         """Create a new `BinderEntry`, attempting to replace whichever fields are NOT given with defaults provided by
         this `Binder` subclass.
@@ -1160,10 +1151,10 @@ class Binder(BaseBinaryFile):
     def set_default_entry(
         self,
         entry_spec: ENTRY_SPEC,
-        new_id: int = None,
-        new_name: str = None,
-        new_path: str | Path = None,
-        new_flags: int = None,
+        new_id: int | None = None,
+        new_name: str | None = None,
+        new_path: str | Path | None = None,
+        new_flags: int | None = None,
     ) -> BinderEntry:
         """Retrieve or create `BinderEntry` specified by `entry_spec`, a la `dict.setdefault()`.
 
@@ -1179,7 +1170,9 @@ class Binder(BaseBinaryFile):
         """
         try:
             # NOTE: Will raise an unhandled `MultipleEntriesFoundError` if multiple entries are found.
-            return self[entry_spec]
+            # We make sure to use the base Binder `__getitem__` since subclasses may override it
+            # (though this isn't recommended due to semantic confusion).
+            return Binder.__getitem__(self, entry_spec)
         except EntryNotFoundError:
             # Create new entry. Value of `entry_spec` is redirected to the appropriate creation argument.
 
@@ -1253,12 +1246,12 @@ class Binder(BaseBinaryFile):
         found = None
         for entry in self.entries:
             if getattr(entry, attr) == value:
-                if found:
+                if found is not None:
                     raise MultipleEntriesFoundError(f"Multiple entries found with `{attr} == {value}`.")
                 found = entry
-        if found:
+        if found is not None:
             return found
-        raise EntryNotFoundError(f"No entry found in '{self.path.name}' with `{attr} == {value}`.")
+        raise EntryNotFoundError(f"No entry found in '{self.path_name or '<unknown>'}' with `{attr} == {value}`.")
 
     def find_entry_by_id(self, entry_id: int):
         """Return the first entry with the given `entry_id`.
@@ -1455,8 +1448,9 @@ class Binder(BaseBinaryFile):
         """Method that can be overridden (usually by a game subclass) to generate a default new entry ID.
         
         Default method simply returns the ID after the highest currently ID (which may leave gaps in earlier ranges).
+        If there are currently no entries, 0 is returned.
         """
-        return self.highest_entry_id + 1
+        return 0 if self.highest_entry_id is None else self.highest_entry_id + 1
 
     def __iter__(self) -> tp.Iterator[BinderEntry]:
         return iter(self.entries)
@@ -1468,9 +1462,9 @@ class Binder(BaseBinaryFile):
         """Implemented so that instances with no entries do not evaluate as `False` (they may have other attributes)."""
         return True
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if not self.entries:
-            return
+            return f"{self.__class__.__name__}(<empty>)"
         entries = f",\n    ".join(repr(entry) for entry in self.entries)
         if entries:
             entries = f"\n    {entries},\n"

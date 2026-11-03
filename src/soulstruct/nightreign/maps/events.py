@@ -5,8 +5,8 @@ import typing as tp
 from dataclasses import dataclass
 
 from soulstruct.base.maps.msb.msb_entry import MSBBinaryStruct
-from soulstruct.eldenring.maps.events import *  # noqa: F403
-from soulstruct.eldenring.maps.events import MSBEvent
+from soulstruct.eldenring.maps.msb.events import *  # noqa: F403
+from soulstruct.eldenring.maps.msb.events import MSBEvent
 
 from .enums import MSBEventSubtype
 

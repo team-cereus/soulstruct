@@ -12,7 +12,6 @@ from pathlib import Path
 
 from soulstruct.base.game_types.map_types import MapEntity
 from soulstruct.games import Game
-from soulstruct.utilities.text import PY_NAME_RE
 from soulstruct.utilities.misc import IDList
 
 from .msb import MSB, MSBEntry, MSBEntryList
@@ -27,19 +26,24 @@ TRAILING_DIGIT_RE = re.compile(r"(.*?)(\d+)")
 class EnumModuleGenerator:
 
     msb: MSB
-    path: Path
+    path: Path | None
     map_stem: str
     game: Game
 
-    def __init__(self, msb: MSB, map_stem: str = None):
+    def __init__(self, msb: MSB, map_stem=""):
         self.msb = msb
         self.path = msb.path
-        self.map_stem = map_stem or self.path.name.split(".")[0]
+        if map_stem:
+            self.map_stem = map_stem
+        elif not self.path:
+            raise ValueError("Must pass a `map_stem` to `EnumModuleGenerator` if `msb.path` is not set.")
+        else:
+            self.map_stem = self.path.name.split(".")[0]
         self.game = self.msb.get_game()
 
     def write_enums_module(
         self,
-        output_module_path: str | Path = None,
+        output_module_path: str | Path | None = None,
         append_to_module: str = "",
         separate_region_points_volumes: bool = False,
         sort_by_id=False,
@@ -144,7 +148,12 @@ class EnumModuleGenerator:
 
             else:
                 # Standard: just one enum per subtype.
-                class_name = subtype_game_type.get_msb_entry_supertype_subtype(pluralized_subtype=True)[1]
+                supertype_name, subtype_class_name = subtype_game_type.get_msb_entry_supertype_subtype(
+                    pluralized_subtype=True
+                )
+                # `subtype_class_name` is `None` for supertypes that have no distinct subtype (e.g. base `Region`).
+                # Fall back to the pluralized supertype name (e.g. "Regions") so we always emit a valid identifier.
+                class_name = subtype_class_name or supertype_name
                 subtype_list = getattr(self.msb, subtype_name)  # type: MSBEntryList
                 if subtype_list:
                     class_contents = self._get_enum_class_contents(subtype_list, sort_by_id, subtype_comment_func)
@@ -191,7 +200,7 @@ class EnumModuleGenerator:
                 name = entry.name
             else:
                 last_is_non_ascii = False
-                if not PY_NAME_RE.match(name):
+                if not name.isidentifier():
                     class_lines.append(f"# TODO: Invalid Python variable name.")
                     class_lines.append(f"# {entry.name} = {entity_id}")  # invalid name commented out
                 else:

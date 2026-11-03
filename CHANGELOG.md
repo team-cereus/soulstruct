@@ -5,14 +5,57 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-## [2.4.0] - 2026-11-03
+---
+
+## [2.5.0] - 2026-09-21
 
 ### Added
+- `RemoTAE` class for TAE variant found in RemoBND cutscene binders.
+
+### Fixed
+- `SIBCAM` doesn't require any FoV keyframes to write.
+- `SIBCAM` aligns end to 16 on write rather than padding 16.
+
+## [2.4.3] - 2026-09-13
+
+### Changed
+- Vector types `__eq__` now require another Vector, not just any array-like.
+  - Can still compare Vector `.data` to array-likes with `np.array_equal`.
+
+### Added
+- Added `GameType` enum for supported games.
+- Added `__format__` to Vector types (passed to component floats).
+
+### Removed
+- Removed enums/configs and stopped pretending that Demon's Souls Remake will ever be supported :/.
+
+## [2.4.2] - 2026-09-08
+
+### Fixed
+- Fixed `MergedMesh.split_mesh()` regression with uninitialized loop UV data.
+- Fixed `test_mesh_tools` unit tests to reflect new `SplitMeshDef` layout (`kwargs` replaced).
+
+## [2.4.1] - 2026-09-07
+
+### Added
+- Added links to related repos in README.
+
+### Changed
+- Streamlined `SplitMeshDef` usage for `MergedMesh.split_mesh()` property passthrough.
+
+## [2.4.0] - 2026-09-06
+
+### Added
+- GitHub publish to PyPI workflow added.
 - `BoneTree` class for manipulating bones outside index-based `FLVER`.
 - `soulstruct.containers.Binder` methods refactored to match signatures of new `pyrelink.core.Binder`.
 - UV utilities for FLVER meshes.
 - Elden Ring shader sampler group improvements.
 - Added this Changelog (with rough collected history).
+- `ARMOR_SETS` constants for DS1.
+- `write_data_to_file`, `sync_file`, `sync_directory` functions with smart diffing.
+- `ProgressCallback` optional argument added to large classes (e.g. directories).
+- Added `default` field to `ParamFieldMetadata`.
 
 ### Changed
 - Minimum Python version raised to 3.13.
@@ -29,6 +72,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Bones per mesh for `MergedMesh` split must be >= 12 (minimum that a single face could weight to).
 - Streamlined `bone_indices` vs. `normal_w` bone indices for static meshes in `MergedMesh` split.
 - Euler base class name changed to `EulerBase` for consistency.
+- `TimescaledFoVKeyframe` struct for SIBCAM to make it clear what the time value means.
+- Removed and discouraged `__getitem__` overrides in `Binder` subclasses.
+- `eldenring.maps.msb` changed from module to package (largely replaced by Firelink C++).
+- DrawParam slot 0 (DS1) is now permitted to be missing (`None`, e.g. "default" map lighting).
+- DrawParam DS1R default/m99 handling (PTDE layout) now LBYL rather than EAFP.
 
 ### Fixed
 - Fixed `FLVERMesh.uv_count` validation.
@@ -39,12 +87,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fixed dupe-vertex searching bug in `MergedMesh`.
 - Fixed hashing of `EulerDeg/EulerRad` types.
 - Fixed SIBCAM rotation fields from `Vector3` to `EulerRad`.
+- Fixed `IDList.insert` index corruption.
+- Fixed `int_group_to_bit_set` for 256-bit groups.
+- Fixed EMEVD event layers offset write.
+- Fixed PTDE `GameParamBND` entry autogen.
+- Fixed `MergedMesh` arrays for unused bone weights/indices.
+- Fixed Bloodborne MSB structs.
+- Fixed TAE header struct.
+- Fixed DS1R FEV/FSB file parsing.
+- Fixed DCX_ZSTD compression.
+- Fixed Elden Ring `Param` write.
+- Fixed ESD subcondition writing.
+- Fixed BXF4 writing.
+- Fixed MSB JSON `EulerDeg` read/write.
+- Fixed Elden Ring EMEDF bugs from DS3 port.
+- Fixed DS3 `RunCommonEvent`.
+- Fixed `MATBIN` write.
+- Fixed `is_dynamic` arg to `MergedMesh.split_mesh()`.
+- Fixed Elden Ring `MapStudioDirectory` tiles.
+- Fixed EVS `pass` statement handling.
+- Fixed `EnumModuleGenerator` for Regions with no subtyping.
+- Fixed missing data files in built Python wheel.
+- Fixed MANY assorted bugs across EMEVD, ESD, Param.
+- Fixed `goals/unknown_scripts` initialization in LuaBND from `from_unpacked_path()`.
+- Fixed referrer entry tracking copying for `MSBEntry` deep copy.
 
 ### Removed
 - Removed placeholder DeSR (Demon's Souls Remastered) support stub.
 - Removed support for Python < 3.13.
-
----
+- Removed vanilla EVS scripts/enums (moved to `soulstruct-vanilla` repo).
+- Removed `ParamDict` fallback class; `ParamRow` types MUST be complete/valid for game support.
 
 ## [2.3.3] - 2026-03-30
 

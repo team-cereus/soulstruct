@@ -55,6 +55,7 @@ __all__ = [
     "CollisionTyping",
     "AnimatedEntityTyping",
     "CoordEntityTyping",
+    "LightEventTyping",
     "SoundEventTyping",
     "NavigationEventTyping",
     "EnvironmentEventTyping",
@@ -131,9 +132,9 @@ class Map(GameObject):
 
             # We can set defaults for base entity ID and base flag from area and block IDs.
             if self.base_entity_id == 0:
-                self.base_entity_id = 100000 * self.area_id + 10000 * self.block_id
+                self.base_entity_id = self.area_id * 10_0000 + self.block_id * 1_0000
             if self.base_flag == 0:
-                self.base_flag = 1000 + 10 * self.area_id + self.block_id
+                self.base_flag = 1000_0000 + self.area_id * 10_0000 + self.block_id * 1_0000  # e.g. 11020000 for m10_02
         else:
             self.map_stem = None
 
@@ -148,10 +149,6 @@ class Map(GameObject):
         for stem in ("emevd", "msb", "ai", "esd"):
             if getattr(self, f"{stem}_file_stem") == "":
                 setattr(self, f"{stem}_file_stem", self.map_stem)
-
-        if self.area_id is not None:
-            self.base_entity_id = 100000 * self.area_id + 10000 * self.block_id
-            self.flag_prefix = 1000 + 10 * self.area_id + self.block_id
 
     def stem_set(self):
         return {
@@ -175,8 +172,11 @@ class Map(GameObject):
         """Map is uniquely defined by its MSB stem."""
         return hash(self.msb_file_stem)
 
-    def __eq__(self, other_map: Map):
-        return self.area_id == other_map.area_id and self.block_id == other_map.block_id
+    def __eq__(self, other_map: object):
+        """Map is uniquely defined by its MSB stem."""
+        if not isinstance(other_map, Map):
+            return NotImplemented
+        return self.msb_file_stem == other_map.msb_file_stem
 
     def __iter__(self):
         return iter((self.area_id, self.block_id, self.cc_id, self.dd_id))
@@ -273,7 +273,7 @@ class NavmeshModel(MapModel):
     """Navmesh model (e.g. n0000)."""
     @classmethod
     def get_msb_entry_supertype_subtype(cls, pluralized_subtype=False):
-        return ("Models", "NavmesheModels") if pluralized_subtype else ("Models", "NavmeshModel")
+        return ("Models", "NavmeshModels") if pluralized_subtype else ("Models", "NavmeshModel")
 # endregion
 
 
@@ -513,10 +513,10 @@ class DummyObject(Object):
 
 
 class DummyAsset(Asset):
-    """Unused (or cutscene-only) asset in MSB."""
+    """Unused (or cutscene-only) asset in MSB (later games)."""
     @classmethod
     def get_msb_entry_supertype_subtype(cls, pluralized_subtype=False):
-        return ("Parts", "DummyObjects") if pluralized_subtype else ("Parts", "DummyObject")
+        return ("Parts", "DummyAssets") if pluralized_subtype else ("Parts", "DummyAsset")
 
 
 class DummyCharacter(Character):

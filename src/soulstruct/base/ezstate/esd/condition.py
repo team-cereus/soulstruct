@@ -45,7 +45,7 @@ class Condition:
         subconditions = []
         if header.subcondition_pointers_offset > 0:
             reader.seek(header.subcondition_pointers_offset)
-            subcondition_offsets = reader.unpack(f"{len(header.subcondition_pointers_count)}v")
+            subcondition_offsets = reader.unpack(f"{header.subcondition_pointers_count}v")
             for offset in subcondition_offsets:
                 reader.seek(offset)
                 subconditions.append(Condition.from_esd_reader(reader))  # safe recursion
@@ -210,8 +210,6 @@ class Condition:
             s = f"{ind}# if {cond_expr}:\n"
         else:
             s = f"{ind}if {cond_expr}:\n"
-
-        print(s)
 
         if self.pass_commands:
             for command in self.pass_commands:

@@ -4,6 +4,7 @@ These `Game` instances are also used as singletons for game checking."""
 from __future__ import annotations
 
 __all__ = [
+    "GameType",
     "Game",
     "GAMES",
     "get_game",
@@ -22,6 +23,7 @@ __all__ = [
 import importlib
 import typing as tp
 from dataclasses import dataclass, field
+from enum import IntEnum
 from functools import singledispatchmethod
 from pathlib import Path
 
@@ -30,9 +32,24 @@ from soulstruct.dcx import DCXType
 from soulstruct.utilities.files import SOULSTRUCT_PATH
 
 
+class GameType(IntEnum):
+    """Game identifier."""
+    DemonsSouls = 0
+    DarkSoulsPTDE = 1
+    DarkSoulsDSR = 2
+    DarkSouls2 = 3
+    DarkSouls2SOTFS = 4
+    Bloodborne = 5
+    DarkSouls3 = 6
+    Sekiro = 7
+    EldenRing = 8
+    Nightreign = 9
+
+
 @dataclass(slots=True, kw_only=True, frozen=True)
 class Game:
 
+    game_type: GameType
     variable_name: str
     name: str
     abbreviated_name: str
@@ -42,8 +59,8 @@ class Game:
     special_dcx_types: dict[str, DCXType] = field(default_factory=dict)
     bundled_resource_paths: dict[str, Path] = field(default_factory=dict)
     steam_appid: int | None = None
-    default_game_path: Path = ""
-    generic_game_path: Path = ""
+    default_game_path: Path | None = None
+    generic_game_path: Path | None = None
     save_file_path: Path | None = None
     executable_name: str = ""
     interroot_prefix: str = ""
@@ -100,7 +117,9 @@ class Game:
     def __hash__(self):
         return hash(self.variable_name)
 
-    def __eq__(self, other: Game):
+    def __eq__(self, other: object):
+        if not isinstance(other, Game):
+            return NotImplemented
         return self.variable_name == other.variable_name
 
     def __repr__(self):
@@ -108,6 +127,7 @@ class Game:
 
 
 DEMONS_SOULS = Game(
+    game_type=GameType.DemonsSouls,
     variable_name="DEMONS_SOULS",
     name="Demon's Souls",
     abbreviated_name="des",
@@ -141,6 +161,7 @@ DEMONS_SOULS = Game(
 
 
 DARK_SOULS_PTDE = Game(
+    game_type=GameType.DarkSoulsPTDE,
     variable_name="DARK_SOULS_PTDE",
     name="Dark Souls: Prepare to Die Edition",
     abbreviated_name="ptde",
@@ -172,6 +193,7 @@ DARK_SOULS_PTDE = Game(
 
 
 DARK_SOULS_DSR = Game(
+    game_type=GameType.DarkSoulsDSR,
     variable_name="DARK_SOULS_DSR",
     name="Dark Souls: Remastered",
     abbreviated_name="ds1r",
@@ -213,6 +235,7 @@ DARK_SOULS_DSR = Game(
 
 
 DARK_SOULS_2 = Game(
+    game_type=GameType.DarkSouls2,
     variable_name="DARK_SOULS_2",
     name="Dark Souls II",
     abbreviated_name="ds2",
@@ -224,17 +247,22 @@ DARK_SOULS_2 = Game(
 
 
 DARK_SOULS_2_SOTFS = Game(
+    game_type=GameType.DarkSouls2SOTFS,
     variable_name="DARK_SOULS_2_SOTFS",
     name="Dark Souls II: Scholar of the First Sin",
     abbreviated_name="ds2sotfs",
     submodule_name="darksouls2",  # TODO: Currently identical to DS2.
-    aliases=("darksouls2sotfs", "ds2sotfs", "dks2sotfs", "sotfs"),
+    aliases=(  # lots of options here
+        "darksouls2scholarofthefirstsin", "darksouls2sotfs", "ds2sotfs", "dks2sotfs",
+        "sotfs", "scholarofthefirstsin", "scholar",
+    ),
     default_dcx_type=DCXType.DCX_DFLT_10000_24_9,
     default_game_path=Config.DS2_SOTFS_PATH,
 )
 
 
 BLOODBORNE = Game(
+    game_type=GameType.Bloodborne,
     variable_name="BLOODBORNE",
     name="Bloodborne",
     abbreviated_name="bb",
@@ -263,6 +291,7 @@ BLOODBORNE = Game(
 
 
 DARK_SOULS_3 = Game(
+    game_type=GameType.DarkSouls3,
     variable_name="DARK_SOULS_3",
     name="Dark Souls III",
     abbreviated_name="ds3",
@@ -277,6 +306,7 @@ DARK_SOULS_3 = Game(
 
 
 SEKIRO = Game(
+    game_type=GameType.Sekiro,
     variable_name="SEKIRO",
     name="Sekiro: Shadows Die Twice",
     abbreviated_name="sdt",
@@ -290,6 +320,7 @@ SEKIRO = Game(
 
 
 ELDEN_RING = Game(
+    game_type=GameType.EldenRing,
     variable_name="ELDEN_RING",
     name="Elden Ring",
     abbreviated_name="er",
@@ -321,6 +352,7 @@ ELDEN_RING = Game(
 
 
 NIGHTREIGN = Game(
+    game_type=GameType.Nightreign,
     variable_name="NIGHTREIGN",
     name="Elden Ring: Nightreign",
     abbreviated_name="nr",
@@ -333,7 +365,8 @@ NIGHTREIGN = Game(
     default_game_path=Config.NIGHTREIGN_PATH,
     executable_name="nightreign.exe",
     interroot_prefix="N:\\GR\\data\\INTERROOT_win64",
-    default_file_paths=dict(ELDEN_RING.default_file_paths),
+    # Only directories with a `soulstruct.nightreign` submodule behind them (no `events` / `text` yet).
+    default_file_paths={"MapStudioDirectory": ELDEN_RING.default_file_paths["MapStudioDirectory"]},
 )
 
 
@@ -352,13 +385,23 @@ GAMES = (
 )
 
 
-def get_game(game_name: str | Game):
+def get_game(game_name: str | GameType | Game):
     """Spaces, case, apostrophes, and colons in aliases don't matter."""
     if isinstance(game_name, Game):
         return game_name
+
+    if isinstance(game_name, GameType):
+        for game in GAMES:
+            if game.game_type == game_name:
+                return game
+        raise ValueError(f"Invalid game type: {game_name}")
+
+    if not isinstance(game_name, str):
+        raise TypeError(f"Invalid game name type: {type(game_name)}. Must be str, GameType, or Game.")
+
     game_name = game_name.lower()
     for old, new in ((" ", ""), ("'", ""), (":", ""), ("iii", "3"), ("ii", "2")):
-        game_name.replace(old, new)
+        game_name = game_name.replace(old, new)
     if game_name in {"darksouls", "darksouls1", "dks", "ds1", "ds"}:
         raise ValueError(f"Ambiguous game name: {game_name}. For Dark Souls 1, try 'ptde' or 'dsr' instead.")
     hits = []

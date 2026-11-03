@@ -4,7 +4,7 @@ __all__ = ["Texture"]
 
 import logging
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 from soulstruct.utilities.binary import *
 from soulstruct.utilities.maths import Vector2
@@ -78,7 +78,7 @@ class Texture:
             writer.fill_with_position("_texture_type_offset", obj=self)
             writer.pack_z_string(self.texture_type, encoding=encoding)
         elif not texture_type_optional:
-            raise ValueError(f"Texture {self} has `texture_type == None`, which is not invalid for this FLVER version.")
+            raise ValueError(f"Texture {self} has `texture_type == None`, which is not valid for this FLVER version.")
         else:
             # Only possible in FLVER0 versions.
             writer.fill("_texture_type_offset", 0, obj=self)
@@ -89,12 +89,14 @@ class Texture:
         Any existing '.tga' or '.tpf' extension in `name` will be removed and replaced with '.tga'.
         """
         name = name.removesuffix(".tga").removesuffix(".tpf") + ".tga"
-        self.path = str(Path(self.path).with_name(name))
+        # We use `PureWindowsPath` to preserve backslashes.
+        self.path = str(PureWindowsPath(self.path).with_name(name))
 
     @property
     def path_parent(self) -> str:
         """Directory part of FLVER texture path, as a string. Includes (exactly one) trailing backslash."""
-        return str(Path(self.path).parent).rstrip("\\") + "\\"
+        # We use `PureWindowsPath` to preserve backslashes.
+        return str(PureWindowsPath(self.path).parent).rstrip("\\") + "\\"
 
     @property
     def name(self) -> str:

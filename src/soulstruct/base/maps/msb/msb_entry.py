@@ -23,7 +23,7 @@ from types import MappingProxyType, ModuleType
 
 from constrata.metadata import *
 from soulstruct.utilities.binary import *
-from soulstruct.utilities.maths import BaseVector, Vector2, Vector3, Vector4, EulerDeg
+from soulstruct.utilities.maths import BaseEuler, BaseVector, Vector2, Vector3, Vector4, EulerDeg, EulerRad
 from soulstruct.utilities.misc import IDList
 from soulstruct.utilities.text import pad_chars
 
@@ -68,12 +68,23 @@ class MSBFieldDisplayInfo(tp.NamedTuple):
 
 
 class MSBEntryReference(tp.NamedTuple):
+    """Stored in reference targets, so they know which `MSBEntry` fields are currently referencing them.
+
+    Required for safe reference handling when entries are removed.
+    """
     referrer: MSBEntry
     field_name: str
     array_index: int | None = None
 
+    def set_value(self, new_value: MSBEntry | None):
+        """Set the value of the field in the referrer to `new_value`, which may be `None`."""
+        if self.array_index is None:
+            setattr(self.referrer, self.field_name, new_value)
+        else:
+            getattr(self.referrer, self.field_name)[self.array_index] = new_value
 
-def EntryRef(list_name: str, field_name="", array_size: int = None) -> dict[str, tp.Any]:
+
+def EntryRef(list_name: str, field_name="", array_size: int | None = None) -> dict[str, tp.Any]:
     """Dataclass field metadata generator indicating a reference that should be resolved with `MSBEntry.try_index`.
 
     If `field_name` is empty, it will be detected by just removing '_index' suffix from the field name.
@@ -125,7 +136,7 @@ class MSBBinaryStruct(BinaryStruct, abc.ABC):
 
     @classmethod
     def _resolve_msb_ref_fields(cls):
-        if cls._MSB_REF_FIELDS is None:
+        if cls.__dict__.get("_MSB_REF_FIELDS") is None:
             cls._MSB_REF_FIELDS = {}
             for fld in cls.get_binary_fields():
                 if "msb_ref" in fld.metadata:
@@ -226,6 +237,7 @@ class MSBEntry(abc.ABC):
 
     _FIELD_REGEX = {
         "msb_ref": re.compile(r"^(MSB[A-Za-z0-9]+)$"),
+        "msb_ref_index": re.compile(r"^_.+_index$"),
         "list": re.compile(r"list\[([\w |]+)\]"),
     }
 
@@ -310,7 +322,7 @@ class MSBEntry(abc.ABC):
             value = value.value
         try:
             setattr(self, field_name, value)  # will go through validation
-        except AttributeError:
+        except ValueError:  # not `AttributeError`
             raise KeyError(f"Field {repr(field_name)} does not exist in MSB entry type {self.__class__.__name__}.")
 
     def set(self, **kwargs):
@@ -352,7 +364,11 @@ class MSBEntry(abc.ABC):
         setattr(self, "entity_id", value.value)  # attribute validated (`object.__setattr__` not used)
 
     def copy(self):
-        """Copy entry with only shallow copies of fields referencing other `MSBEntry`s."""
+        """Copy entry with only shallow copies of fields referencing other `MSBEntry`s.
+
+        TODO: It's unclear what a shallow copy of a referenced entry gets us. That entry may still reference
+         other entries (not copied). Copying MSB entries requires top-down careful handling from the MSB.
+        """
         copied_dict = {}
         for f in self.get_entry_fields():
             value = getattr(self, f.name)
@@ -371,6 +387,26 @@ class MSBEntry(abc.ABC):
                 copied_dict[f.name] = copy.deepcopy(value)
 
         return self.from_dict(copied_dict)
+
+    def __deepcopy__(self, memo: dict[int, tp.Any]) -> tp.Self:
+        """Deep copy this entry, *rebuilding* its referring-entry tracker instead of copying it.
+
+        Needed because the default `slots=True` dataclass copy protocol restores slots in an arbitrary order: setting
+        an `MSBEntry`-typed field appends to the *referenced* entry's `referring_entry_fields`, and that entry may
+        still be a bare `cls.__new__(cls)` shell with no slots assigned yet, which raised `AttributeError` on the
+        name-mangled `__referring_entry_fields` slot. Assigning that slot first, before any other field, removes the
+        ordering dependency.
+
+        The tracker is not copied. It is repopulated naturally as `__setattr__` records each reference in the copied
+        graph, which is the only way to get trackers that point at the *copies* rather than the originals.
+        """
+        cls = self.__class__
+        new_entry = cls.__new__(cls)
+        memo[id(self)] = new_entry  # registered before recursion, so reference cycles resolve to this copy
+        new_entry.__referring_entry_fields = []
+        for f in self.get_entry_fields():
+            setattr(new_entry, f.name, copy.deepcopy(getattr(self, f.name), memo))
+        return new_entry
 
     @classmethod
     def get_field_names(cls, visible_only=False) -> tuple[str, ...]:
@@ -394,12 +430,11 @@ class MSBEntry(abc.ABC):
                 elif f.type in (BitSet1024, BitSet1024.__name__):
                     decoders[f.name] = [BitSet1024.from_repr]
                 elif f.type in (EulerDeg, EulerDeg.__name__):
-                    # LEGACY: 'Vector3' JSON strings can be read as EulerDeg.
-                    decoders[f.name] = [EulerDeg.from_repr, Vector3.from_repr]
+                    decoders[f.name] = [EulerDeg.from_repr]
                 else:
                     for check_type in (Vector2, Vector3, Vector4):
                         if f.type in (check_type, check_type.__name__):
-                            decoders[f.name] = check_type
+                            decoders[f.name] = [check_type]
                             break
             cls._CUSTOM_JSON_DECODERS = MappingProxyType(decoders)
 
@@ -436,20 +471,23 @@ class MSBEntry(abc.ABC):
         decoders = cls.get_custom_json_decoders()
         for field_name, field_value in data.items():
             if field_name in decoders:
+                field_decoders = decoders[field_name]
                 # Try each custom string decoder for this field, in order (only first is non-deprecated).
-                for i in range(len(decoders[field_name])):
+                for i, field_decoder in enumerate(field_decoders):
                     try:
-                        kwargs[field_name] = decoders[field_name][i](field_value)
+                        kwargs[field_name] = field_decoder(field_value)
                     except Exception as ex:
-                        if i == 0:
+                        if i == len(field_decoders) - 1:
+                            raise ValueError(
+                                f"All custom JSON decoders for field '{field_name}' in `{cls.__name__}` failed. "
+                                f"Decoders: {field_decoders}"
+                            ) from ex
+                        elif i == 0:
+                            # First decoder failed, but others remain to try.
                             _LOGGER.warning(
                                 f"Custom JSON decoder for field '{field_name}' in `{cls.__name__}` failed: {ex}. "
                                 f"Trying deprecated alternatives."
                             )
-                        elif i == len(decoders[field_name]) - 1:
-                            raise ValueError(
-                                f"All custom JSON decoders for field '{field_name}' in `{cls.__name__}` failed."
-                            ) from ex
                     else:
                         if i > 0:
                             _LOGGER.warning(
@@ -551,13 +589,12 @@ class MSBEntry(abc.ABC):
             elif isinstance(value, list) and any(isinstance(element, MSBEntry) for element in value):
                 # Construct a reference dictionary. (There are no real dictionary fields in `MSBEntry` subclasses.)
                 ref_list = []
-                ref_subtype_list = None
                 for element in value:
                     if element is None:
                         ref_list.append(None)
                     else:
-                        if ref_subtype_list is None:
-                            ref_subtype_list = msb.get_list_of_entry(element)
+                        # NOTE: It's unlikely but not impossible that array elements have different subtypes.
+                        ref_subtype_list = msb.get_list_of_entry(element)
                         ref_list.append({
                             "subtype": (ref_subtype_list.supertype, ref_subtype_list.subtype_name),
                             "subtype_index": ref_subtype_list.index(element)
@@ -599,7 +636,7 @@ class MSBEntry(abc.ABC):
 
         This is slow and is deactivated when reading binary MSBs.
         """
-        if self.__class__.SETATTR_CHECKS_DISABLED or "__" in key:
+        if MSBEntry.SETATTR_CHECKS_DISABLED or "__" in key:
             # Bypass validation.
             super(MSBEntry, self).__setattr__(key, value)
             return
@@ -751,6 +788,24 @@ class MSBEntry(abc.ABC):
                     super(MSBEntry, self).__setattr__(key, vector_value)
                     return
 
+                if field_type in {"EulerDeg", "EulerRad"}:
+                    euler_type = {"EulerDeg": EulerDeg, "EulerRad": EulerRad}[field_type]
+                    if isinstance(value, BaseEuler):
+                        # Wrong `BaseEuler` unit: convert rather than reinterpret.
+                        euler_value = value.to_rad() if euler_type is EulerRad else value.to_deg()
+                    else:
+                        # Any three-element sequence (including `Vector3`) is taken to already be in this field's
+                        # unit, which is what makes `rotate=[0.0, 90.0, 0.0]` work like `translate=[...]` does.
+                        try:
+                            euler_value = euler_type(value)
+                        except (ValueError, TypeError):
+                            raise ValueError(
+                                f"Can only assign three-element sequences or `BaseEuler` instances to `{field_type}` "
+                                f"field `{self.cls_name}.{field_name}`, not: {value}"
+                            )
+                    super(MSBEntry, self).__setattr__(key, euler_value)
+                    return
+
                 if field_type in {"bool", "int", "float", "str"}:
                     py_type = _BASIC_ENTRY_TYPES.get(field_type)
                     if isinstance(value, int) and py_type is float:
@@ -768,15 +823,15 @@ class MSBEntry(abc.ABC):
 
         raise ValueError(f"Invalid `MSBEntry` subclass field: `{self.cls_name}.{key}`")
 
-    @classmethod
+    @staticmethod
     @contextlib.contextmanager
-    def setattr_checks_disabled(cls):
+    def setattr_checks_disabled():
         """Disable `__setattr__` type checks temporarily."""
-        cls.SETATTR_CHECKS_DISABLED = True
+        MSBEntry.SETATTR_CHECKS_DISABLED = True
         try:
             yield
         finally:
-            cls.SETATTR_CHECKS_DISABLED = False
+            MSBEntry.SETATTR_CHECKS_DISABLED = False
 
     @classmethod
     def _is_subtype(cls, value: MSBEntry, parent_type_name: str) -> bool:
@@ -790,13 +845,13 @@ class MSBEntry(abc.ABC):
     def _is_permitted_wrong_msb_entry_type(self, value: MSBEntry) -> bool:
         """Checks for a handful of permitted exceptions for incorrect `MSBEntry` field references."""
 
-        # Special exceptions (with warnings) for unused character/object models, which have been known
+        # Special exceptions (with warnings) for dummy character/object models, which have been known
         # to reference the wrong model type in Undead Burg in DSR (thanks QLOC?).
         if self.cls_name == "MSBDummyCharacter" and value.__class__.__name__ == "MSBObjectModel":
             # TODO: Could do a hash check for vanilla DSR file to skip m10_01 warning. But that seems REALLY try-hard.
             # _LOGGER.warning(
             #     f"`MSBDummyCharacter` '{self.name}' uses an `MSBObjectModel`: '{value.name}'.\n"
-            #     f"    This happens, e.g., in m10_01_00_00 in vanilla DSR (unused bonfire 'o0200_0004')."
+            #     f"    This happens, e.g., in m10_01_00_00 in vanilla DSR (dummy bonfire 'o0200_0004')."
             # )
             return True
         if self.cls_name == "MSBDummyCharacter" and value.__class__.__name__ == "MSBAssetModel":
@@ -816,7 +871,7 @@ class MSBEntry(abc.ABC):
         """Retrieve display info for field `field_name` in this `MSBEntry` subclass."""
 
         # TODO: Add info about nested structs (e.g. GPARAM).
-        if cls._FIELD_DISPLAY_INFO is not None:
+        if cls.__dict__.get("_FIELD_DISPLAY_INFO") is not None:
             try:
                 return cls._FIELD_DISPLAY_INFO[field_name]
             except KeyError:
@@ -836,7 +891,7 @@ class MSBEntry(abc.ABC):
             if f.name.startswith("_"):
                 continue  # ignore (not a displayed field)
 
-            metadata = f.metadata.get("msb", None)  # type: MapFieldMetadata
+            metadata = f.metadata.get("msb", None)  # type: MapFieldMetadata | None
             if metadata is not None:
                 # Some or all of these may be empty, and still need to be generated automatically below
                 nickname = metadata.nickname
@@ -850,7 +905,7 @@ class MSBEntry(abc.ABC):
 
             if not nickname or not tooltip:
                 # Try to get default name and/or tooltip.
-                subtype_name = cls.SUBTYPE_ENUM.name.replace("Unused", "")  # redirect 'Unused' subtypes
+                subtype_name = cls.SUBTYPE_ENUM.name.replace("Dummy", "")  # redirect 'Dummy' subtypes
                 keys = (f"{subtype_name}[{f.name}]", f"{cls.SUPERTYPE_ENUM.name}[{f.name}]")
                 for key in keys:
                     if key in FIELD_INFO:
@@ -902,6 +957,10 @@ class MSBEntry(abc.ABC):
                             display_type = Vector3
                         case "Vector4":
                             display_type = Vector4
+                        case "EulerDeg":
+                            display_type = EulerDeg
+                        case "EulerRad":
+                            display_type = EulerRad
                         case "MSBPart":
                             display_type = getattr(game_types_module, "MapPart")
                         case "MSBRegion":
@@ -932,7 +991,7 @@ class MSBEntry(abc.ABC):
     @classmethod
     def get_field_types(cls):
         """NOTE: Using string types from dataclass field annotations due to circular entry type references."""
-        if cls._FIELD_TYPES is not None:
+        if cls.__dict__.get("_FIELD_TYPES") is not None:
             return cls._FIELD_TYPES
 
         f_annotations = cls.all_annotations()
@@ -980,6 +1039,10 @@ class MSBEntry(abc.ABC):
                 field_types[f.name] = f"{element_ann}[{length}]"
             elif ann in _BASIC_ENTRY_TYPES:
                 field_types[f.name] = ann
+            elif cls._FIELD_REGEX["msb_ref_index"].match(f.name):
+                if ann != "int | None":
+                    _LOGGER.warning(f"Expected annotation 'int | None' for MSB entry index '{f.name}', not: '{ann}'")
+                field_types[f.name] = "int | None"
             else:
                 # Try to parse as a type union of `MSBEntry` subclasses.
                 entry_types = [e.strip() for e in ann.split("|")]
@@ -1028,17 +1091,15 @@ class MSBEntry(abc.ABC):
                 field_strings.append(f"    {field_name}={repr(value)},")
         return f"{self.cls_name}(\n" + "\n".join(field_strings) + "\n)"
 
-    def __eq__(self, entry: MSBEntry):
+    def __eq__(self, entry: object) -> bool:
         """Checks field equality, but only matches `MSBEntry` references by name."""
-        if entry is None:
-            return False
         if not isinstance(entry, self.__class__):
-            return False
+            return NotImplemented
         for f in self.get_entry_fields():
             value = getattr(self, f.name)
             other = getattr(entry, f.name)
             if isinstance(value, MSBEntry):
-                if value.name != other.name:
+                if other is None or value.name != other.name:
                     return False
             elif isinstance(value, (list, tuple, set)):
                 if any(isinstance(element, MSBEntry) for element in value):

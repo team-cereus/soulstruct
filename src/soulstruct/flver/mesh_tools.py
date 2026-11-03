@@ -10,7 +10,7 @@ in the UI as "face corners" now.)
 Core classes
 ------------
 - `SplitMeshDef`: per-output-submesh definition (material, vertex layout, dynamic flag,
-  Mesh/FaceSet kwargs, and the UV layer names that submesh consumes). One is supplied for
+  Mesh/FaceSet properties, and the UV layer names that submesh consumes). One is supplied for
   each distinct value of `faces[:, 3]` when splitting.
 - `MergedMeshLoops`: the per-loop attribute arrays (normals, tangents, bitangents, vertex
   colors, UVs, cloth tangents) that are not part of the deduplicated vertex data.
@@ -68,10 +68,18 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class SplitMeshDef(tp.NamedTuple):
+    # `FLVERMesh` material and layout
     material: Material
     layout: VertexArrayLayout
+    # `FLVERMesh` other properties (direct passthrough)
     is_dynamic: bool  # required for correct bone index handling and sets `FLVERMesh.is_dynamic`
-    kwargs: dict[str, tp.Any]
+    default_bone_index: int = 0
+    use_backface_culling: bool = True
+    uses_bounding_boxes: bool = True
+    face_set_count: int = 1
+    f0_unk_x46: int = 0  # FLVER0 only (no non-zero cases known)
+    # UV layer names to remap global UV layer names to local `uv_{i}` fields in the split mesh.
+    # If `None`, defaults to `UVMap{i}` for each UV layer.
     uv_layer_names: list[str] | None = None
 
     def get_validated_uv_layer_names(self, global_uv_layer_names: tp.Iterable[str], index: int) -> list[str]:
@@ -83,7 +91,7 @@ class SplitMeshDef(tp.NamedTuple):
         if len(uv_layer_names) != uv_count:
             raise ValueError(
                 f"UV layer names for split mesh {index} do not match layout UV count: "
-                f"{self.uv_layer_names} does not have {uv_count} elements."
+                f"{uv_layer_names} does not have {uv_count} elements."
             )
         if any(layer_name not in global_uv_layer_names for layer_name in uv_layer_names):
             raise ValueError(
@@ -100,18 +108,15 @@ class SplitMeshDef(tp.NamedTuple):
         """
         split_mesh_defs = []
         for mesh in flver.meshes:
-            kwargs = {
-                "default_bone_index": mesh.default_bone_index,
-                "use_backface_culling": mesh.use_backface_culling,  # from FaceSet 0 in `FLVER`
-                "uses_bounding_boxes": mesh.uses_bounding_boxes,
-            }
-
             split_mesh_defs.append(
                 cls(
                     material=mesh.material,
                     is_dynamic=mesh.is_dynamic,
                     layout=mesh.vertex_arrays[0].layout,
-                    kwargs=kwargs,
+                    default_bone_index=mesh.default_bone_index,
+                    use_backface_culling=mesh.use_backface_culling,  # from FaceSet 0
+                    uses_bounding_boxes=mesh.uses_bounding_boxes,
+                    f0_unk_x46=mesh.f0_unk_x46,
                 )
             )
         return split_mesh_defs
@@ -418,10 +423,16 @@ class MergedMesh:
 
             mesh_vertices = all_vertices[i:j]
 
+            # `bone_weights`/`bone_indices` are always present in `dtype`, but will never be visited by the
+            # `merged_field_sources` loop below if NO mesh in the entire FLVER supplies them (e.g. static map
+            # pieces). Initialize them here so they are never left as uninitialized `np.empty` memory.
+            mesh_vertices["bone_weights"] = MergedMeshLoops.DEFAULTS["bone_weights"]
+            mesh_vertices["bone_indices"] = MergedMeshLoops.DEFAULTS["bone_indices"]
+
             def _mesh_source_or_default(_name: str, _default: tp.Any):
                 """Get mesh source array/field or return default (for uninitialized arrays)."""
                 try:
-                    _va_index, _va_field_name = merged_field_sources[name][mesh_index]
+                    _va_index, _va_field_name = merged_field_sources[_name][mesh_index]
                 except KeyError:
                     return _default
                 return mesh.vertex_arrays[_va_index][_va_field_name]
@@ -462,6 +473,7 @@ class MergedMesh:
                         mesh_vertices["bone_indices"] = bone_indices
                     continue
 
+                found_name_match = False
                 for loop_array, name_option in (
                     (loops.normals, "normal"),
                     (loops.normals_w, "normal_w"),
@@ -472,7 +484,10 @@ class MergedMesh:
                     if name == name_option:
                         assert loop_array is not None
                         loop_array[i:j] = _mesh_source_or_default(name_option, MergedMeshLoops.DEFAULTS[name_option])
-                        continue
+                        found_name_match = True
+                        break
+                if found_name_match:
+                    continue
 
                 if name.startswith("tangent_"):
                     t_i = int(name.removeprefix("tangent_"))
@@ -595,9 +610,9 @@ class MergedMesh:
             likely an artifact of From's FLVER export process.
 
             3. Two faces with the same material share all three vertices and have vertex normals with DIFFERENT
-            ORIENTATION (separated by 90 degrees or more). These are NOT 'duplicate' faces because they are likely to be
-            rendered from different sides. We should NOT merge these vertices, as Blender does not support two faces
-            (which we do want here) sharing the exact same vertices. TODO: This was true when using BMesh, at least.
+            ORIENTATION (separated by at least ~154 degrees). These are NOT 'duplicate' faces because they are likely
+            to be rendered from different sides. We should NOT merge these vertices, as Blender does not support two
+            faces (which we do want here) sharing the exact same vertices.
 
             4. Two faces with different materials share all three vertices. If the materials have mask prefixes (in
             particular, DIFFERENT mask prefixes) like '#00#' and '#01#', then this is likely a genuine case of two faces
@@ -779,9 +794,12 @@ class MergedMesh:
         self.loop_data.normals /= np.linalg.norm(self.loop_data.normals, axis=1, keepdims=True)
 
     def normalize_tangents(self):
-        """Ditto for tangents. See above."""
-        for i in range(len(self.loop_data.tangents)):
-            self.loop_data.tangents[i] /= np.linalg.norm(self.loop_data.tangents[i], axis=1, keepdims=True)
+        """Ditto for tangents. See above.
+
+        We avoid touching the fourth element (bitangent sign).
+        """
+        for tangents in self.loop_data.tangents:
+            tangents[:, :3] /= np.linalg.norm(tangents[:, :3], axis=1, keepdims=True)
 
     def round_normals(self, decimals=3):
         """Round loop normal data in place to a given number of decimal places.
@@ -821,10 +839,11 @@ class MergedMesh:
     ) -> list[FLVERMesh]:
         """Splits merged mesh into FLVER meshes.
 
-        `split_mesh_defs` must be a list of FLVER `Material` instances, appropriate layouts, and combined
-        `Mesh/FaceSet` kwargs for each value that appears in `faces[:, 3]`. The merged mesh will be split based on
+        `split_mesh_defs` is a list of `SplitMeshDef` instances, each defining the `FLVERMesh` and `FaceSet` relevant
+        properties for a single compulsory `FLVERMesh`. The enumeration of these should correspond directly to the
+        face material indices in the fourth column of `MergedMesh.faces`. The merged mesh will be split based on
         these values (and maybe further split by bone maximum if `use_mesh_bone_indices == True`) and the created
-        `Mesh` and `FaceSet` instances will take their materials, layouts, and miscellaneous kwargs from this list.
+        `Mesh` and `FaceSet` instances will take their materials, layouts, and properties.
 
         If `uv_layer_names` is given for a `split_mesh_defs` element, it should be a list of lists of UV layer
         names that indicate which keys in `MergedMesh.loop_data.uvs` are used by each corresponding mesh. This will
@@ -843,8 +862,8 @@ class MergedMesh:
 
         If a mesh material index has no faces, it will be ignored.
 
-        `is_dynamic` must appear in each mesh kwargs dictionary, as it is used to determine bone index style. For
-        modern `FLVER` format, it will also be used to set `mesh.is_dynamic`.
+        `is_dynamic` must be set by each `SplitMeshDef`, as it is used to determine bone index style. For modern
+        `FLVER` formats, it will also be used to set `mesh.is_dynamic`.
 
         If `unused_bone_indices_are_minus_one` is True, it will be assumed that the bone indices in
         `self.vertex_bone_indices` have been set to -1 when unused, rather than the FLVER standard of zero (which can be
@@ -863,30 +882,30 @@ class MergedMesh:
 
         TODO: Handle multiple-VA meshes with cloth_tangent and cloth_bitangent.
         """
-        if use_mesh_bone_indices and max_bones_per_mesh < 3:
-            raise ValueError("`max_bones_per_mesh` must be >= 3 (and realistically should be much higher).")
+        if use_mesh_bone_indices and max_bones_per_mesh < 12:
+            raise ValueError(
+                "`max_bones_per_mesh` must be at least 12 (max number of bones that could be weighted by "
+                "a single triangle)."
+            )
 
         # Split each `SplitMeshDef` into its component information for efficiency.
         mesh_materials = [mesh_def.material for mesh_def in split_mesh_defs]
         mesh_layouts = [mesh_def.layout for mesh_def in split_mesh_defs]
-        mesh_is_dynamic = [mesh_def.is_dynamic for mesh_def in split_mesh_defs]
-        mesh_kwargs = [mesh_def.kwargs for mesh_def in split_mesh_defs]
         mesh_uv_layer_names = [
             mesh_def.get_validated_uv_layer_names(self.loop_data.uvs, i)
             for i, mesh_def in enumerate(split_mesh_defs)
         ]
 
-        # Check `face_set_count` is within range for all mesh kwargs.
-        for i, kwargs in enumerate(mesh_kwargs):
-            if "face_set_count" in kwargs:
-                if not 1 <= kwargs["face_set_count"] <= 3:
-                    raise ValueError(f"Mesh {i} `face_set_count` must be between 1 and 3 (inclusive) for splitting.")
+        # Check `face_set_count` is within range for all split mesh definitions.
+        for i, split_mesh_def in enumerate(split_mesh_defs):
+            if not 1 <= split_mesh_def.face_set_count <= 3:
+                raise ValueError(f"`SplitMeshDef[{i}].face_set_count` must be 1, 2, or 3.")
 
         # We construct two material dtypes: one that uses global UV layer names, and the true one that uses tightly
         # packed 'uv_{i}' UV names. These names are the only difference, so we can just reassign the dtype at the end.
         global_uv_material_dtypes = []
         true_material_dtypes = []
-        for layout, uv_layer_names in zip(mesh_layouts, mesh_uv_layer_names):
+        for layout, uv_layer_names in zip(mesh_layouts, mesh_uv_layer_names, strict=True):
             true_dtype = layout.get_dtypes()[1]  # decompressed fields
             global_dtype_fields = []
             for field_name, (field_fmt, field_index) in true_dtype.fields.items():
@@ -916,7 +935,7 @@ class MergedMesh:
 
         # Stores tuples of `(material_index, loop_array, mesh_bone_indices)` for each mesh. Every three rows in
         # `loop_array` comprises a unique face, so face indices are implicit.
-        # These are further subsplit by bone maximum if applicable. Loop arrays have not yet been reduced down to unique
+        # These are further sub-split by bone maximum if applicable. Loop arrays have not yet been reduced down to unique
         # rows only (happens afterward).
         # NOTE: Data will be EXTRACTED from `merged_loops` by index, making no assumptions about which meshes share
         # loop data (which will never happen when `MergedMesh` is constructed from a single FLVER, but may in custom
@@ -924,10 +943,10 @@ class MergedMesh:
         split_mesh_info = []  # type: list[tuple[int, np.ndarray, tp.Optional[np.ndarray]]]
 
         merged_loop_views = {}  # minor optimization (construct each dtype-dependent view only once)
-        for material_index, global_uv_material_dtype in enumerate(global_uv_material_dtypes):
+        for split_mesh_def_index, global_uv_material_dtype in enumerate(global_uv_material_dtypes):
 
             # Split `faces` and indexed `merged_loops` by material index (column 3).
-            mesh_faces = self.faces[self.faces[:, 3] == material_index][:, :3]  # `(n, 3)` array
+            mesh_faces = self.faces[self.faces[:, 3] == split_mesh_def_index][:, :3]  # `(n, 3)` array
             if len(mesh_faces) == 0:
                 # This is an unused material index. Do not create any meshes.
                 continue
@@ -953,23 +972,20 @@ class MergedMesh:
             if uses_vertex_bone_indices and use_mesh_bone_indices:
                 # We may need to split this mesh due to max bone count.
                 split_mesh_info += self.subsplit_faces(
-                    material_index,
+                    split_mesh_def_index,
                     mesh_loops,
-                    is_dynamic=mesh_is_dynamic[material_index],
+                    is_dynamic=split_mesh_defs[split_mesh_def_index].is_dynamic,
                     max_bones_per_mesh=max_bones_per_mesh,
                     unused_bone_indices_are_minus_one=unused_bone_indices_are_minus_one,
                 )
             else:
                 # Vertex bone indices are global and have no maximum count (or are missing altogether).
-                split_mesh_info.append((material_index, mesh_loops, None))
+                split_mesh_info.append((split_mesh_def_index, mesh_loops, None))
 
         split_meshes = []
 
-        for material_index, mesh_loops, mesh_bone_indices in split_mesh_info:
-            kwargs = mesh_kwargs[material_index].copy()  # may be used by multiple subsplit meshes
-
+        for split_mesh_def_index, mesh_loops, mesh_bone_indices in split_mesh_info:
             # Duplicate loop data is finally removed here, giving the true vertex data stored in the FLVER mesh.
-
             if normal_tangent_dot_threshold >= 1.0:
                 # Use `np.unique` to remove EXACT duplicate vertices only.
                 mesh_vertices, face_vertex_indices = self.loops_to_flver_vertices_exact(mesh_loops)
@@ -981,9 +997,9 @@ class MergedMesh:
 
             if 0 < max_mesh_vertex_count < len(mesh_vertices):
                 raise ValueError(
-                    f"Mesh {material_index} has {len(mesh_vertices)} vertices, which is greater than the "
+                    f"Mesh {split_mesh_def_index} has {len(mesh_vertices)} vertices, which is greater than the "
                     f"maximum of {max_mesh_vertex_count}. You need to (a) simplify this mesh (material name "
-                    f"{mesh_materials[material_index].name}), (b) manually split it into multiple meshes by "
+                    f"{mesh_materials[split_mesh_def_index].name}), (b) manually split it into multiple meshes by "
                     f"duplicating its material slot, or (c) try lowering `normal_tangent_dot_max` to merge "
                     f"vertices with similar normals/tangents more aggressively (current value = "
                     f"{normal_tangent_dot_threshold})."
@@ -995,30 +1011,37 @@ class MergedMesh:
                 bone_indices[bone_indices == -1] = 0
 
             # Reassign true dtype to vertex array (with local 'uv_{i}' names instead of merged global UV layer names).
-            mesh_vertices = mesh_vertices.astype(true_material_dtypes[material_index], copy=False)
+            mesh_vertices = mesh_vertices.astype(true_material_dtypes[split_mesh_def_index], copy=False)
 
-            vertex_array = VertexArray(array=mesh_vertices, layout=mesh_layouts[material_index])
+            vertex_array = VertexArray(array=mesh_vertices, layout=mesh_layouts[split_mesh_def_index])
 
-            face_set_count = kwargs.pop("face_set_count", 1)
+            # Retrieve SplitMeshDef to pass through FLVERMesh properties.
+            # The same SplitMeshDef will be used for each sub-split mesh.
+            split_mesh_def = split_mesh_defs[split_mesh_def_index]
             face_set = FaceSet.from_triangles(
-                face_vertex_indices, use_backface_culling=kwargs.pop("use_backface_culling")
+                face_vertex_indices,
+                use_backface_culling=split_mesh_def.use_backface_culling,
             )
-            material = mesh_materials[material_index]
+            material = mesh_materials[split_mesh_def_index]
+
             mesh = FLVERMesh(
                 face_sets=[face_set],
                 material=material,
                 vertex_arrays=[vertex_array],
                 bone_indices=mesh_bone_indices,
-                **kwargs,  # e.g. 'default_bone_index', 'uses_bounding_boxes', 'is_dynamic'
+                is_dynamic=split_mesh_def.is_dynamic,
+                default_bone_index=split_mesh_def.default_bone_index,
+                uses_bounding_boxes=split_mesh_def.uses_bounding_boxes,
+                f0_unk_x46=split_mesh_def.f0_unk_x46,
             )
             if not is_flver0:
                 # No point refreshing bounding boxes for FLVER0 versions.
                 mesh.refresh_bounding_boxes()
 
-            if face_set_count > 1:  # already validated as 2 or 3 only
+            if split_mesh_def.face_set_count > 1:  # already validated as 2 or 3 only
                 # Duplicate default face set (0) to LOD levels 1 and/or 2, setting `FaceSet.flags` appropriately.
                 base_face_set = mesh.face_sets[0]
-                for i in range(1, face_set_count):
+                for i in range(1, split_mesh_def.face_set_count):
                     face_set = FaceSet(
                         flags=i,  # 1 or 2
                         is_triangle_strip=base_face_set.is_triangle_strip,  # False
@@ -1207,14 +1230,25 @@ class MergedMesh:
 
         names = set(combined_dtype.names)  # order is unimportant for initialization
 
+        # `loop_vertex_indices` marks FLVER vertices never used by any face with the sentinel `2 ** 32 - 1`
+        # (see `loops_to_flver_vertices_exact`/`_approx`). Such loops are never referenced by `self.faces`, so their
+        # actual vertex/bone data is irrelevant here, but indexing `vertex_data` with the raw sentinel value would
+        # raise `IndexError`. Remap sentinel entries to a safe (unused) index of 0 before indexing.
+        unused_loop_mask = self.loop_vertex_indices == 2 ** 32 - 1
+        if np.any(unused_loop_mask):
+            safe_loop_vertex_indices = self.loop_vertex_indices.copy()
+            safe_loop_vertex_indices[unused_loop_mask] = 0
+        else:
+            safe_loop_vertex_indices = self.loop_vertex_indices
+
         if "position" in names:
-            positions = self.vertex_data["position"][self.loop_vertex_indices]  # (loop_count, 3)
+            positions = self.vertex_data["position"][safe_loop_vertex_indices]  # (loop_count, 3)
             combined_array["position"] = positions
         if "bone_weights" in names:
-            bone_weights = self.vertex_data["bone_weights"][self.loop_vertex_indices]  # (loop_count, 4)
+            bone_weights = self.vertex_data["bone_weights"][safe_loop_vertex_indices]  # (loop_count, 4)
             combined_array["bone_weights"] = bone_weights
         if "bone_indices" in names:
-            bone_indices = self.vertex_data["bone_indices"][self.loop_vertex_indices]  # (loop_count, 4)
+            bone_indices = self.vertex_data["bone_indices"][safe_loop_vertex_indices]  # (loop_count, 4)
             combined_array["bone_indices"] = bone_indices
         if "normal" in names:
             if self.loop_data.normals is None:
@@ -1251,16 +1285,18 @@ class MergedMesh:
 
         tangent_names = [n for n in names if n.startswith("tangent_")]
         for tangent_name in tangent_names:
-            t_i = int(tangent_name[-1])
+            t_i = int(tangent_name.removeprefix("tangent_"))
             combined_array[f"tangent_{t_i}"] = self.loop_data.tangents[t_i]  # (loop_count, 4)
 
-        # Combined array still uses global UV layer names.
-        for uv_layer_name in self.loop_data.uvs:
+        # Combined array still uses global UV layer names (e.g. 'UVTexture0', 'UVMap1'), NOT the tightly packed
+        # 'uv_{i}' names used by `true_material_dtypes`, so we cannot filter by an 'uv_' name prefix here.
+        uv_layer_names = [n for n in names if n in self.loop_data.uvs]
+        for uv_layer_name in uv_layer_names:
             combined_array[uv_layer_name] = self.loop_data.uvs[uv_layer_name]
 
         color_names = [n for n in names if n.startswith("color_")]
         for color_name in color_names:
-            c_i = int(color_name[-1])
+            c_i = int(color_name.removeprefix("color_"))
             combined_array[f"color_{c_i}"] = self.loop_data.vertex_colors[c_i]  # (loop_count, 4)
 
         return combined_array
@@ -1320,11 +1356,3 @@ class MergedMesh:
     @property
     def loop_cloth_bitangents(self) -> NDArray[np.float32] | None:
         return self.loop_data.cloth_bitangents
-
-    @staticmethod
-    def unique(array: np.ndarray, max_value=None):
-        """More efficient `np.unique()` (for reasonable array lengths) that uses masking and does NOT sort."""
-        max_value = max_value or np.max(array) + 1
-        used = np.zeros(max_value, dtype=np.uint8)
-        used[array] = 1
-        return np.argwhere(used == 1)[:, 0]

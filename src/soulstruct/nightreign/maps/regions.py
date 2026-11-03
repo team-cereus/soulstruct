@@ -6,8 +6,8 @@ from dataclasses import dataclass
 
 from soulstruct.utilities.binary import *
 
-from soulstruct.eldenring.maps.regions import *  # noqa: F403
-from soulstruct.eldenring.maps.regions import MSBRegion, MSBBinaryStruct
+from soulstruct.eldenring.maps.msb.regions import *  # noqa: F403
+from soulstruct.eldenring.maps.msb.regions import MSBRegion, MSBBinaryStruct
 
 from .enums import MSBRegionSubtype
 

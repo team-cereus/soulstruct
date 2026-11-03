@@ -17,7 +17,7 @@ import abc
 import ast
 import logging
 import typing as tp
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, MISSING
 from types import MappingProxyType
 
 from soulstruct.base.game_types import GAME_INT_TYPE
@@ -70,6 +70,8 @@ class ParamRow(BinaryStruct):
 
     # Cached on first use. Maps binary field names (i.e. not including Name/RawName) to `ParamFieldMetadata` instances.
     _FIELD_PARAM_METADATA: tp.ClassVar[MappingProxyType[str, ParamFieldMetadata]] = None
+    # Cached on first use in `__getitem__/__setitem__`. Maps internal names to attribute names for fast lookup.
+    _FIELDS_BY_INTERNAL_NAME: tp.ClassVar[dict[str, str]] = None
 
     RawName: bytes = field(default=b"", metadata={"NOT_BINARY": True})
     Name: str = field(default="", metadata={"NOT_BINARY": True})
@@ -81,32 +83,50 @@ class ParamRow(BinaryStruct):
     def __getitem__(self, field_name_or_nickname: str) -> PARAM_VALUE_TYPING:
         if field_name_or_nickname.lower() == "name":
             return self.Name
-        elif field_name_or_nickname.lower() == "rawname":
+        if field_name_or_nickname.lower() == "rawname":
             return self.RawName
 
-        for binary_field in self.get_binary_fields():
-            if binary_field.name == field_name_or_nickname:
-                return getattr(self, binary_field.name)
-            elif binary_field.metadata["param"].internal_name == field_name_or_nickname:
-                return getattr(self, binary_field.name)
-        raise KeyError(f"No field with internal name or nickname '{field_name_or_nickname}'.")
+        try:
+            return getattr(self, field_name_or_nickname)
+        except AttributeError:
+            if self._FIELDS_BY_INTERNAL_NAME is None:
+                binary_fields = self.get_binary_fields()
+                self.__class__._FIELDS_BY_INTERNAL_NAME = {
+                    f.metadata["param"].internal_name.lower(): f.name for f in binary_fields
+                }
+            try:
+                nickname = self._FIELDS_BY_INTERNAL_NAME[field_name_or_nickname.lower()]
+            except KeyError:
+                raise KeyError(
+                    f"No field with name or internal name '{field_name_or_nickname}' in "
+                    f"{self.cls_name} Param (case-insensitive)."
+                )
+            return getattr(self, nickname)
 
     def __setitem__(self, field_name_or_nickname: str, value: PARAM_VALUE_TYPING):
         if field_name_or_nickname.lower() == "name":
             self.Name = value
             return
-        elif field_name_or_nickname.lower() == "rawname":
+        if field_name_or_nickname.lower() == "rawname":
             self.RawName = value
             return
 
-        for binary_field in self.get_binary_fields():
-            if binary_field.name == field_name_or_nickname:
-                setattr(self, binary_field.name, value)
-                return
-            elif binary_field.metadata["param"].internal_name == field_name_or_nickname:
-                setattr(self, binary_field.name, value)
-                return
-        raise KeyError(f"No field with internal name or nickname '{field_name_or_nickname}'.")
+        try:
+            setattr(self, field_name_or_nickname, value)
+        except AttributeError:
+            if self._FIELDS_BY_INTERNAL_NAME is None:
+                binary_fields = self.get_binary_fields()
+                self.__class__._FIELDS_BY_INTERNAL_NAME = {
+                    f.metadata["param"].internal_name.lower(): f.name for f in binary_fields
+                }
+            try:
+                nickname = self._FIELDS_BY_INTERNAL_NAME[field_name_or_nickname.lower()]
+            except KeyError:
+                raise KeyError(
+                    f"No field with name or internal name '{field_name_or_nickname}' in "
+                    f"{self.cls_name} Param (case-insensitive)."
+                )
+            setattr(self, nickname, value)
 
     @classmethod
     def get_internal_names(cls) -> tuple[str, ...]:
@@ -128,6 +148,9 @@ class ParamRow(BinaryStruct):
                 if not metadata.game_type:
                     # Set `game_type` from type hint if not set explicitly in `ParamRow` subclass.
                     metadata.game_type = field_types[f.name]
+                if metadata.default is None and f.default is not MISSING:
+                    # Backfill from the `dataclasses` default, so the two can never disagree.
+                    metadata.default = f.default
                 field_metadata[f.name] = metadata
             cls._FIELD_PARAM_METADATA = MappingProxyType(field_metadata)
 
@@ -182,7 +205,7 @@ class ParamRow(BinaryStruct):
         return self.get_binary_field_names()
 
     def __repr__(self):
-        field_values = [f"\n    {key} = {value}" for key, value in self.to_dict(ignore_pads=True)]
+        field_values = [f"\n    {key} = {value}" for key, value in self.to_dict(ignore_pads=True).items()]
         return f"\nName: {self.try_name}" + "".join(field_values)
 
     @classmethod
@@ -211,7 +234,9 @@ class ParamRow(BinaryStruct):
     def get_packed_name(self, encoding: str) -> bytes:
         raw_name = self.Name.encode(encoding) if self.Name else self.RawName
         terminator = b"\0\0" if encoding.replace("-", "").startswith("utf16") else b"\0"
-        raw_stripped = raw_name.rstrip(b"\0")
+        raw_stripped = raw_name
+        while raw_stripped.endswith(terminator):
+            raw_stripped = raw_stripped[:-len(terminator)]
         if not raw_stripped:
             return b""  # zero offset for name
         return raw_stripped + terminator
@@ -234,6 +259,10 @@ class ParamFieldMetadata:
     dynamic_callback: DynamicParamField | None = None
     tooltip: str = "TOOLTIP-TODO"
     is_pad: bool = False
+    # Value this field has in the game's `ParamDef`, i.e. the value a brand-new row of this type gets. Mirrors the
+    # `dataclasses.Field.default` that `ParamField()` sets, so consumers with only the metadata (the GUI, which dims
+    # untouched fields) don't have to reach back into `dataclasses.fields()`. `None` means "not recorded".
+    default: tp.Any = None
 
     def get_display_type(self) -> type:
         """Prefers `param_enum` to `game_type`, but redirects basic BOOL enums to Python `bool`."""
@@ -278,6 +307,7 @@ def ParamField(
             hide=hide,
             dynamic_callback=dynamic_callback,
             tooltip=tooltip,
+            default=default,
         ),
     }
 
@@ -297,6 +327,7 @@ def ParamPad(size: int, internal_name: str):
             dynamic_callback=None,
             tooltip=f"Null padding ({size} bytes).",
             is_pad=True,
+            default=b"\0" * size,
         ),
     }
     return field(default=b"\0" * size, **metadata)
@@ -315,6 +346,7 @@ def ParamBitPad(field_type: type[PRIMITIVE_FIELD_TYPING], internal_name: str, bi
             hide=True,
             dynamic_callback=None,
             tooltip=f"Null padding ({bit_count} bits).",
+            default=0,
         ),
     }
     return field(default=0, **metadata)

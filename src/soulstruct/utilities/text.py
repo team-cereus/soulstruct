@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 __all__ = [
-    "PY_NAME_RE",
     "word_wrap",
     "camel_case_to_spaces",
     "string_to_identifier",
@@ -13,8 +12,6 @@ __all__ = [
 
 import re
 import textwrap
-
-PY_NAME_RE = re.compile(r"^[A-z_][\w_]*$")  # valid Python variable name
 
 
 def word_wrap(text, line_limit=50):
@@ -65,7 +62,7 @@ def string_to_identifier(spaces_string: str, remove_prefixes=(), preserve_models
 
 def pad_chars(text, encoding=None, null_terminate=True, alignment=4, pad: str | bytes = None) -> str | bytes:
     """Pad text out to given multiple of byte length with null bytes. Optionally, encode it first."""
-    if alignment < 0 or not isinstance(alignment, int):
+    if alignment < 1 or not isinstance(alignment, int):
         raise ValueError("pad must be an integer greater than zero.")
     if encoding is not None:
         encoded = text.encode(encoding) + (b"\0" if null_terminate else b"")

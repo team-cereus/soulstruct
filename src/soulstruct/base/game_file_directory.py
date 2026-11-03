@@ -9,7 +9,8 @@ import typing as tp
 from dataclasses import field
 from pathlib import Path
 
-from soulstruct.utilities.files import create_bak, get_blake2b_hash
+from soulstruct.utilities.files import create_bak, write_data_to_path
+from soulstruct.utilities.progress import ProgressCallback, report_progress
 from .base_binary_file import BaseBinaryFile
 from .metaclasses import PathDataclassMeta
 
@@ -38,7 +39,7 @@ class GameFileDirectory[BASE_BINARY_FILE_T: BaseBinaryFile](abc.ABC, metaclass=P
 
     @classmethod
     def from_path(cls, directory_path: Path | str):
-        if cls.FILE_NAME_PATTERN is None or cls.FILE_CLASS is None:
+        if not hasattr(cls, "FILE_NAME_PATTERN") or not hasattr(cls, "FILE_CLASS"):
             raise TypeError(
                 f"`GameFileDirectory` subclass `{cls.__name__}` must define `FILE_NAME_PATTERN` and `FILE_CLASS` class "
                 f"variables, or override `from_path()` with its own different logic."
@@ -58,12 +59,18 @@ class GameFileDirectory[BASE_BINARY_FILE_T: BaseBinaryFile](abc.ABC, metaclass=P
 
     @staticmethod
     def _write(
-        paths_instances: dict[Path, BaseBinaryFile], check_file_hashes=False, no_partial_write=True
+        paths_instances: dict[Path, BaseBinaryFile],
+        force=False,
+        no_partial_write=True,
+        progress: ProgressCallback | None = None,
     ) -> list[Path]:
         """Internal write method. Subclasses may determine file paths differently, then call this."""
         packed_files = {}  # type: dict[Path, bytes]
-        for file_path, instance in paths_instances.items():
+        # Packing and writing both count towards one total, so the caller's bar advances monotonically.
+        total = len(paths_instances) * 2
+        for i, (file_path, instance) in enumerate(paths_instances.items()):
             file_path = instance.get_file_path(file_path)
+            report_progress(progress, i, total, file_path.name)
             try:
                 packed_dcx = bytes(instance)
             except Exception as ex:
@@ -72,20 +79,16 @@ class GameFileDirectory[BASE_BINARY_FILE_T: BaseBinaryFile](abc.ABC, metaclass=P
                     raise
                 _LOGGER.error(f"Failed to pack {file_path.name}: {ex}. Continuing with other files...")
                 continue
-            if check_file_hashes and file_path.is_file():
-                if get_blake2b_hash(file_path) == get_blake2b_hash(packed_dcx):
-                    continue  # don't write file
             packed_files[file_path] = packed_dcx
 
         # All files packed successfully (or partial write permitted).
         written_paths = []
-        for file_path, packed_dcx in packed_files.items():
-            file_path.parent.mkdir(parents=True, exist_ok=True)
-            create_bak(file_path)
-            with file_path.open("wb") as f:
-                f.write(packed_dcx)
-            written_paths.append(file_path)
+        for i, (file_path, packed_dcx) in enumerate(packed_files.items()):
+            report_progress(progress, len(paths_instances) + i, total, file_path.name)
+            if write_data_to_path(packed_dcx, file_path, force=force):
+                written_paths.append(file_path)
 
+        report_progress(progress, total, total, "")
         return written_paths
 
     def _log_directory_write(self, directory_path: Path, file_count: int):
@@ -100,8 +103,9 @@ class GameFileDirectory[BASE_BINARY_FILE_T: BaseBinaryFile](abc.ABC, metaclass=P
     def write(
         self,
         directory_path: Path | str | None = None,
-        check_file_hashes: bool = False,
+        force: bool = False,
         no_partial_write: bool = True,
+        progress: ProgressCallback | None = None,
     ) -> list[Path]:
         if directory_path is None:
             if self.directory is None:
@@ -114,14 +118,17 @@ class GameFileDirectory[BASE_BINARY_FILE_T: BaseBinaryFile](abc.ABC, metaclass=P
             for file_stem, instance in self.files.items()
         }
 
-        written_paths = self._write(file_paths, check_file_hashes, no_partial_write)
+        written_paths = self._write(
+            file_paths, force=force, no_partial_write=no_partial_write, progress=progress
+        )
         self._log_directory_write(directory_path, len(written_paths))
         return written_paths
 
     def keys(self):
         return self.files.keys()
 
-    __iter__ = keys
+    def __iter__(self):
+        return iter(self.files)
 
     def values(self):
         return self.files.values()
@@ -154,7 +161,7 @@ class GameFileMapDirectory[BASE_BINARY_FILE_T](GameFileDirectory[BASE_BINARY_FIL
     @classmethod
     def from_path(cls, directory_path: Path | str):
         # NOTE: Pattern is still used in combination with `Map` stems.
-        if cls.FILE_NAME_PATTERN is None or not hasattr(cls, "FILE_CLASS"):
+        if not hasattr(cls, "FILE_NAME_PATTERN") or not hasattr(cls, "FILE_CLASS"):
             raise TypeError(
                 f"`GameFileDirectory` subclass `{cls.__name__}` must define `FILE_NAME_PATTERN` and `FILE_CLASS` class "
                 f"variables, or override `from_path()` with its own different logic."
@@ -188,7 +195,11 @@ class GameFileMapDirectory[BASE_BINARY_FILE_T](GameFileDirectory[BASE_BINARY_FIL
         return cls(directory=directory_path, files=files)
 
     def write(
-        self, directory_path: Path | str | None = None, check_file_hashes=False, no_partial_write=True
+        self,
+        directory_path: Path | str | None = None,
+        force=False,
+        no_partial_write=True,
+        progress: ProgressCallback | None = None,
     ) -> list[Path]:
         """Same as `GameFileDirectory`, but reports unknown files and if any maps are missing."""
         if directory_path is None:
@@ -211,7 +222,7 @@ class GameFileMapDirectory[BASE_BINARY_FILE_T](GameFileDirectory[BASE_BINARY_FIL
                 f"{', '.join(all_map_stems)}"
             )
 
-        written_paths = self._write(file_paths, check_file_hashes, no_partial_write)
+        written_paths = self._write(file_paths, force, no_partial_write, progress=progress)
         if written_paths:
             _LOGGER.info(
                 f"`{self.__class__.__name__}` written to `{directory_path}` successfully "

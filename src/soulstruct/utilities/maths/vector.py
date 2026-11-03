@@ -30,7 +30,6 @@ class BaseVector(abc.ABC):
     _RE_FROM_REPR = re.compile(r"^(\w+)\((.+)\)$")  # e.g. "Vector3(1, 2, 3)"
 
     LENGTH: tp.ClassVar[int]
-    REPR_PRECISION: tp.ClassVar[int] = 5
 
     _data: np.ndarray
 
@@ -40,12 +39,12 @@ class BaseVector(abc.ABC):
         if isinstance(data, BaseVector):
             arr = data._data.copy()
         else:
-            arr = np.asarray(data, dtype=float)
+            arr = np.array(data, dtype=float)  # copy
         arr.flags.writeable = False
         object.__setattr__(self, "_data", arr)
 
-    def __array__(self, dtype=None):
-        return self._data if dtype is None else self._data.astype(dtype, copy=False)
+    def __array__(self, dtype=None, copy=None):
+        return self._data if dtype is None else self._data.astype(dtype, copy=copy)
 
     # READ-ONLY
 
@@ -128,8 +127,12 @@ class BaseVector(abc.ABC):
         # noinspection PyTypeChecker
         return self._data[index]
 
-    def __eq__(self, other_vector: VECTOR_LIKE):
-        return np.array_equal(self._data, other_vector)
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, BaseVector):
+            return False
+        if self.LENGTH != other.LENGTH:
+            return False
+        return bool(np.array_equal(self._data, other._data))
 
     def __iter__(self) -> tp.Iterator[float]:
         return iter(self._data)
@@ -142,8 +145,16 @@ class BaseVector(abc.ABC):
             elif x == SINGLE_MAX:
                 elements.append("<SINGLE_MAX>")
             else:
-                elements.append(f"{x:.{self.REPR_PRECISION}}")
+                # `repr()` of a Python float always round-trips exactly.
+                elements.append(repr(float(x)))
         return f"{self.__class__.__name__}(({', '.join(elements)}))"
+
+    def __format__(self, format_spec: str) -> str:
+        """Propagate `format_spec` (e.g. '.3f') to each element, e.g. 'Vector3(1.000, 2.000, 3.000)'."""
+        if not format_spec:
+            return str(self)
+        elements = (format(float(x), format_spec) for x in self._data)
+        return f"{self.__class__.__name__}({', '.join(elements)})"
 
     def __abs__(self) -> float:
         """Get norm of `Vector`."""
@@ -214,6 +225,9 @@ class BaseVector(abc.ABC):
 
         if name != cls.__name__:
             raise ValueError(f"Cannot parse vector string: {s!r} is a {name}, not a {cls.__name__}.")
+
+        # Replace '<SINGLE_MIN>' and '<SINGLE_MAX>' with their float values for parsing.
+        payload = payload.replace("<SINGLE_MIN>", str(SINGLE_MIN)).replace("<SINGLE_MAX>", str(SINGLE_MAX))
 
         try:
             values = list(ast.literal_eval(f"({payload})"))

@@ -108,7 +108,7 @@ class TPFTexture:
     stem: str = ""  # no file extension
     format: int = 1
     texture_type: TextureType = TextureType.Texture
-    mipmap_count: int = 0
+    mipmap_count: int = 0  # NOTE: may differ from stored DDS mipmap count
     texture_flags: int = 0  # {2, 3} -> DCX-compressed (i.e. bit 1); unknown otherwise
     data: bytes = b""
 
@@ -187,7 +187,7 @@ class TPFTexture:
         if texture_struct.texture_flags in {2, 3}:
             # Data is DCX-compressed.
             # TODO: should enforce DCX type as 'DCP_EDGE'?
-            data = decompress(data)
+            data, _ = decompress(data)
 
         stem = reader.unpack_string(offset=stem_offset, encoding=encoding)
 
@@ -216,10 +216,14 @@ class TPFTexture:
                 texture_type = TextureType.Volume
             else:
                 texture_type = TextureType.Texture
-            mipmap_count = dds.header.mipmap_count
+            if texture_type != self.texture_type:
+                _LOGGER.warning(
+                    f"PC `TPFTexture` {self.stem} stores a different `texture_type` ({self.texture_type}) than "
+                    f"its wrapped DDS header ({texture_type}). The DDS value will be written."
+                )
+            # NOTE: SoulsFormats forces `mipmap_count` from DDS here, but this breaks vanilla round trips.
         else:
             texture_type = self.texture_type
-            mipmap_count = self.mipmap_count
 
         self.STRUCT.object_to_writer(
             self,
@@ -227,7 +231,6 @@ class TPFTexture:
             data_offset=RESERVED,
             data_size=RESERVED,
             texture_type=texture_type,
-            mipmap_count=mipmap_count,
         )
 
         if platform != TPFPlatform.PC:
@@ -264,8 +267,8 @@ class TPFTexture:
         writer.fill_with_position("stem_offset", obj=self)
         if encoding_type == 1:  # UTF-16
             stem = self.stem.encode(encoding=writer.byte_order.get_utf_16_encoding()) + b"\0\0"
-        elif encoding_type in {0, 2}:  # shift-jis
-            stem = self.stem.encode(encoding="shift-jis") + b"\0"
+        elif encoding_type in {0, 2}:  # shift_jis_2004
+            stem = self.stem.encode(encoding="shift_jis_2004") + b"\0"
         else:
             raise ValueError(f"Invalid TPF texture encoding type: {encoding_type}. Must be 0, 1, or 2.")
         writer.append(stem)
@@ -338,7 +341,6 @@ class TPFTexture:
             temp_dds_path = Path(png_dir, "temp.dds")
             dds_data = self.get_headerized_data(deswizzle_platform)
             temp_dds_path.write_bytes(dds_data)
-            Path("~/Documents/temp.dds").expanduser().write_bytes(dds_data)
             texconv_result = texconv("-o", png_dir, "-ft", "png", "-f", fmt, "-nologo", temp_dds_path)
             try:
                 return Path(png_dir, "temp.png").read_bytes()
@@ -361,7 +363,6 @@ class TPFTexture:
             temp_dds_path = Path(tga_dir, "temp.dds")
             dds_data = self.get_headerized_data(deswizzle_platform)
             temp_dds_path.write_bytes(dds_data)
-            Path("~/Documents/temp.dds").expanduser().write_bytes(dds_data)
             texconv_result = texconv("-o", tga_dir, "-ft", "tga", "-f", "RGBA", "-nologo", temp_dds_path)
             try:
                 return Path(tga_dir, "temp.tga").read_bytes()
@@ -383,26 +384,27 @@ class TPFTexture:
                 f"TPF texture DDS format {current_format} does not match "
                 f"`assert_input_format` {assert_input_format} ({current_format}"
             )
-        temp_dds_path = Path(__file__).parent / "__temp__.dds"
-        temp_dds_path.write_bytes(self.data)
-        result = convert_dds_file(temp_dds_path, Path(__file__).parent, output_format)  # overwrite temp file
-        if result.returncode == 0:
-            self.data = temp_dds_path.read_bytes()
-            if current_dxgi_format:
-                _LOGGER.info(
-                    f"Converted TPF texture {self.stem} from format {current_format} "
-                    f"(DXGI {current_dxgi_format}) to {output_format}."
-                )
+        with tempfile.TemporaryDirectory() as temp_dds_dir:
+            temp_dds_path = Path(temp_dds_dir) / "__temp__.dds"
+            temp_dds_path.write_bytes(self.data)
+            result = convert_dds_file(temp_dds_path, Path(temp_dds_dir), output_format)  # overwrite temp file
+            if result.returncode == 0:
+                self.data = temp_dds_path.read_bytes()
+                if current_dxgi_format:
+                    _LOGGER.info(
+                        f"Converted TPF texture {self.stem} from format {current_format} "
+                        f"(DXGI {current_dxgi_format}) to {output_format}."
+                    )
+                else:
+                    _LOGGER.info(f"Converted TPF texture {self.stem} from format {current_format} to {output_format}.")
+                return True
             else:
-                _LOGGER.info(f"Converted TPF texture {self.stem} from format {current_format} to {output_format}.")
-            return True
-        else:
-            _LOGGER.error(
-                f"Could not convert TPF texture {self.stem} from format {current_format} to {output_format}.\n"
-                f"   stdout: {result.stdout}\n"
-                f"   stderr: {result.stderr}"
-            )
-            return False
+                _LOGGER.error(
+                    f"Could not convert TPF texture {self.stem} from format {current_format} to {output_format}.\n"
+                    f"   stdout: {result.stdout}\n"
+                    f"   stderr: {result.stderr}"
+                )
+                return False
 
     @staticmethod
     def get_texture_format_info(texture_format: int) -> tuple[bytes, int, bool]:
@@ -570,11 +572,13 @@ class TPFStruct(BinaryStruct):
     file_count: int
     platform: TPFPlatform = binary(byte)
     tpf_flags: byte = field(**(Binary(asserted=[0, 1, 2, 3])))
-    encoding_type: byte = binary(asserted=[0, 1, 2])  # 2 == UTF-16, 0/1 == shift_jis_2004
+    encoding_type: byte = binary(asserted=[0, 1, 2])  # 1 == UTF-16, 0/2 == shift_jis_2004
     _pad1: bytes = binary_pad(1)
 
 
 class TPF(GameFile):
+
+    MANIFEST_NAME: tp.ClassVar[str] = "tpf_manifest.json"
 
     textures: list[TPFTexture] = field(default_factory=list)
     platform: TPFPlatform = TPFPlatform.PC
@@ -602,10 +606,10 @@ class TPF(GameFile):
         path = Path(path)
         if path.is_dir():
             directory = path
-            manifest_path = directory / "tpf_manifest.json"
+            manifest_path = directory / cls.MANIFEST_NAME
             if not manifest_path.exists():
                 raise FileNotFoundError(f"Binder manifest JSON file not found: {manifest_path}")
-        elif path.name == "tpf_manifest.json":
+        elif path.name == cls.MANIFEST_NAME:
             directory = path.parent
             manifest_path = path
         else:
@@ -628,7 +632,10 @@ class TPF(GameFile):
             dds_path = directory / f"{entry['stem']}.dds"
             if not dds_path.is_file():
                 raise FileNotFoundError(f"Could not find DDS file for TPF texture {entry['stem']}: {dds_path}")
-            console_info = TPFTexture.ConsoleInfo(**entry["header"]) if entry.get("header", None) is not None else None
+            if (console_info_dict := entry.get("console_info", None)) is not None:
+                console_info = TPFTexture.ConsoleInfo(**console_info_dict)
+            else:
+                console_info = None
             textures.append(TPFTexture(
                 stem=entry["stem"],
                 format=entry["format"],
@@ -716,7 +723,7 @@ class TPF(GameFile):
                 console_info_dict = {
                     "width": texture.console_info.width,
                     "height": texture.console_info.height,
-                    "mipmaps": texture.console_info.texture_count,
+                    "texture_count": texture.console_info.texture_count,
                     "unk1": texture.console_info.unk1,
                     "unk2": texture.console_info.unk2,
                     "dxgi_format": texture.console_info.dxgi_format.name,
@@ -738,12 +745,12 @@ class TPF(GameFile):
         tpf_manifest = self.get_json_header()
         tpf_manifest["entries"] = texture_entries
 
-        # NOTE: Binder manifest is always encoded in shift-JIS, not `shift_jis_2004`.
-        write_json(directory / "tpf_manifest.json", tpf_manifest, encoding="shift-jis", indent=4)
+        # NOTE: Binder manifest is always encoded in `shift-jis`, not `shift_jis_2004`.
+        write_json(directory / self.MANIFEST_NAME, tpf_manifest, encoding="shift-jis", indent=4)
 
     def get_json_header(self):
         return {
-            "dcx_type": self.dcx_type.name,
+            "dcx_type": self._get_dcx_type().name,
             "platform": self.platform.name,
             "encoding_type": self.encoding_type,
             "tpf_flags": self.tpf_flags,

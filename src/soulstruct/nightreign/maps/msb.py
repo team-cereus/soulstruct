@@ -15,7 +15,7 @@ from soulstruct.utilities.misc import IDList
 
 from soulstruct.eldenring.maps.constants import get_map
 from .enums import *
-from soulstruct.eldenring.maps.events import *
+from soulstruct.eldenring.maps.msb.events import *
 from .events import (
     MSBMapOffsetEvent,
     MSBPatrolInfoEvent,
@@ -28,10 +28,10 @@ from .events import (
     MSBRidingEvent,
     MSBSignPuddleEvent,
 )
-from soulstruct.eldenring.maps.models import *
+from soulstruct.eldenring.maps.msb.models import *
 from .regions import *
-from soulstruct.eldenring.maps.routes import *
-from soulstruct.eldenring.maps.parts import *
+from soulstruct.eldenring.maps.msb.routes import *
+from soulstruct.eldenring.maps.msb.parts import *
 
 
 class MSBEntrySuperlistHeader(BinaryStruct):

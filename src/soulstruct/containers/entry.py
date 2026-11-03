@@ -10,7 +10,7 @@ import typing as tp
 import zlib
 from dataclasses import dataclass
 from enum import IntEnum
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 from soulstruct.utilities.binary import *
 
@@ -167,14 +167,17 @@ class BinderEntry:
         return cls(entry_id=entry_header.entry_id, path=entry_header.path, data=data, flags=entry_header.flags)
 
     def get_header(self, binder_flags: BinderFlags) -> BinderEntryHeader:
-        return BinderEntryHeader(
+        header = BinderEntryHeader(
             self.flags,
             self.data_size,
             self.entry_id,
             self.path,
-            uncompressed_size=self.data_size if binder_flags.has_compression else len(self.get_uncompressed_data()),
+            uncompressed_size=0,  # only written for compressed entries
             data_offset=-1,
         )
+        if binder_flags.has_compression:
+            header.uncompressed_size = len(self.get_uncompressed_data())
+        return header
 
     def get_uncompressed_data(self) -> bytes:
         """Decompresses compressed data first, if appropriate."""
@@ -200,7 +203,8 @@ class BinderEntry:
         """Update just the basename of `path`."""
         if self.path is None:
             raise ValueError("BinderEntry does not have a `path`. Cannot set path name.")
-        self.path = str(Path(self.path).parent.joinpath(new_name))
+        # NOTE: We use `PureWindowsPath` to ensure backslashes are used.
+        self.path = str(PureWindowsPath(self.path).parent.joinpath(new_name))
 
     def to_binary_file[T: BaseBinaryFile](self, binary_file_cls: type[T]) -> T:
         binary_file = binary_file_cls.from_bytes(self.get_uncompressed_data())
@@ -246,12 +250,12 @@ class BinderEntry:
     def directory_with_forward_slashes(self) -> str:
         if self.path is None:
             raise ValueError("BinderEntry does not have a `path`.")
-        return str(Path(self.path).parent).replace("\\", "/")
+        return str(PureWindowsPath(self.path).parent).replace("\\", "/")
 
     def copy(self) -> BinderEntry:
         return BinderEntry(data=self.data, entry_id=self.entry_id, path=self.path, flags=self.flags)
 
-    def write(self, path: str | Path = None):
+    def write(self, path: str | Path | None = None):
         if path is None:
             path = self.name  # relative path only
         Path(path).write_bytes(self.data)

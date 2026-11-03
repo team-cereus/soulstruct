@@ -158,7 +158,7 @@ class Instruction(abc.ABC):
             raise
 
         # Process event layers.
-        if header.event_layers_local_offset > 0:
+        if header.event_layers_local_offset >= 0:
             with reader.temp_offset(event_layers_offset + header.event_layers_local_offset):
                 event_layers = EventLayers.from_emevd_reader(reader)
         else:
@@ -342,7 +342,8 @@ class Instruction(abc.ABC):
             writer.pad(4)
 
     def pack_base_args(self, writer: BinaryWriter, base_args_start_offset: int):
-        if self.category == 1014:  # 'DefineLabel' category has NO arg data offset, not even to empty bytes
+        if self.category == 1014 or not self.args_list:
+            # 'DefineLabel' category (1014) has NO arg data offset, not even to empty bytes
             writer.fill("base_args_local_offset", -1, obj=self)
             return
         writer.fill("base_args_local_offset", writer.position - base_args_start_offset, obj=self)
@@ -358,7 +359,7 @@ class Instruction(abc.ABC):
             writer.fill("event_layers_local_offset", existing_event_layers[self.event_layers], obj=self)
         else:
             # Write new `EventLayers`.
-            relative_offset = event_layers_start_offset - writer.position
+            relative_offset = writer.position - event_layers_start_offset
             writer.fill("event_layers_local_offset", relative_offset, obj=self)
             existing_event_layers[self.event_layers] = relative_offset
             self.event_layers.to_emevd_writer(writer)

@@ -53,8 +53,8 @@ class EMEVDHeaderStruct(BinaryStruct):
     base_arg_data_offset: varuint
     packed_strings_size: varuint
     packed_strings_offset: varuint
-    # TODO: only in 32-bit versions (PTDE, DSR). Can maybe just do a `pad_align(8)` to save the struct subclasses.
-    # _pad2: bytes = binary_pad(4)
+    # 32-bit headers (DeS, PTDE, DSR) have a 4-byte alignment pad here, but we always seek immediately
+    # after reading the header, so don't need the special cases.
 
 
 class EMEVD(GameFile, abc.ABC):
@@ -124,14 +124,13 @@ class EMEVD(GameFile, abc.ABC):
         script_directory: Path | str | None = None,
         common_func_evs: EVSParser | None = None,
     ) -> tp.Self:
-        try:
-            parser = cls.EVS_PARSER(
-                evs_string, name=map_name, script_directory=script_directory, common_func_evs=common_func_evs
-            )
-        except Exception as ex:
-            import traceback
-            traceback.print_exc()
-            raise EMEVDError(f"Error occurred while parsing EVS string: {ex}")
+        """Load an `EMEVD` from an EVS script string, using a new EVS parser instance.
+
+        Raises an `EVSError` (or subclass thereof) if parsing fails.
+        """
+        parser = cls.EVS_PARSER(
+            evs_string, name=map_name, script_directory=script_directory, common_func_evs=common_func_evs
+        )
         return cls.from_evs_parser(parser)
 
     @classmethod
@@ -284,24 +283,28 @@ class EMEVD(GameFile, abc.ABC):
             event.update_signature()
         self.event_signatures = {event_id: event.signature for event_id, event in self.events.items()}
 
-    def to_dict(self) -> dict[str, tp.Any]:
-        self.regenerate_signatures()
+    def to_dict(self):
+        raise NotImplementedError("Cannot convert EMEVD to dict. Convert to numeric text instead.")
 
-        return {
-            "map_name": self.map_name,
-            "linked": self.linked_file_offsets,
-            "strings": self.packed_strings,
-            **self.events,
-        }
+    def write_json(self, file_path: None | str | Path, encoding="utf-8", indent=4):
+        raise NotImplementedError("Cannot write EMEVD to JSON. Convert to numeric text instead.")
 
-    def to_numeric(self):
+    @classmethod
+    def from_dict(cls, data: dict):
+        raise NotImplementedError("Cannot read EMEVD from JSON. Use numeric text instead.")
+
+    @classmethod
+    def from_json(cls, json_path: str | Path) -> tp.Self:
+        raise NotImplementedError("Cannot read EMEVD from JSON. Use numeric text instead.")
+
+    def to_numeric(self) -> str:
         self.regenerate_signatures()
         numeric_output = "\n\n".join([event.to_numeric() for event in self.events.values()])
         numeric_output += "\n\nlinked:\n" + "\n".join(str(offset) for offset in self.linked_file_offsets)
         numeric_output += "\n\nstrings:\n" + "\n".join(s[0] + ": " + s[1] for s in self.unpack_strings())
         return numeric_output
 
-    def get_evs_docstring(self, actual_docstring=""):
+    def get_evs_docstring(self, actual_docstring="") -> str:
         docstring = '"""'
         if actual_docstring:
             docstring += "\n" + actual_docstring.rstrip("\n") + "\n"
@@ -581,16 +584,19 @@ class EMEVD(GameFile, abc.ABC):
 
         return writer
 
-    def write_numeric(self, numeric_path=None):
+    def write_numeric(self, numeric_path=None) -> list[Path]:
+        """Convert EMEVD to numeric format and write to `numeric_path`.
+
+        Always writes, as we would otherwise have to wrangle line endings when comparing content."""
         if not numeric_path:
             numeric_path = self.map_name
             if not numeric_path.endswith(".numeric.txt"):
                 numeric_path += ".numeric.txt"
         numeric_path = Path(numeric_path)
-        if numeric_path.parent:
-            numeric_path.parent.mkdir(exist_ok=True, parents=True)
-        with numeric_path.open("w", encoding="utf-8") as f:
-            f.write(self.to_numeric())
+        # Create directory.
+        numeric_path.parent.mkdir(parents=True, exist_ok=True)
+        Path(numeric_path).write_text(self.to_numeric(), encoding="utf-8")
+        return [numeric_path]
 
     def write_evs(
         self,
@@ -603,7 +609,7 @@ class EMEVD(GameFile, abc.ABC):
         docstring: str = "",
         common_func_emevd: EMEVD | None = None,
         enums_manager: GameEnumsManager | None = None,
-    ):
+    ) -> list[Path]:
         if not evs_path:
             evs_path = self.map_name
             if not evs_path.endswith(".evs.py"):
@@ -621,8 +627,8 @@ class EMEVD(GameFile, abc.ABC):
             common_func_emevd=common_func_emevd,
             enums_manager=enums_manager,
         )
-        with evs_path.open("w", encoding="utf-8") as f:
-            f.write(evs_string)
+        Path(evs_path).write_text(evs_string, encoding="utf-8")
+        return [evs_path]
 
     @classmethod
     def from_auto_detect_source_type(cls, emevd_source: Path | str | bytes | BinaryReader) -> str:

@@ -63,7 +63,7 @@ def setdefault_lambda(dictionary: dict, key, default: tp.Callable[[], tp.Any]):
     return dictionary[key]
 
 
-class BiDict(dict):
+class BiDict[K: str, V: str](dict[K, V]):
     def __init__(self, *args):
         """Initialized with pairs of values to be connected."""
         super().__init__()
@@ -105,8 +105,9 @@ class BiDict(dict):
         self.__values.append(value_2)
 
     def __delitem__(self, key):
+        partner = self[key]
         super().__delitem__(key)
-        super().__delitem__(self[key])
+        super().__delitem__(partner)
 
     def __len__(self):
         return super().__len__() // 2
@@ -196,11 +197,10 @@ class IDList[ELEMENT_T]:
         if item_id in self._index_dict:
             raise ValueError(f"Item `{item}` is already in `IDList`.")
         self._list.insert(index, item)
-        self._index_dict[item_id] = index
-        # Increment all later or equal indices in dict.
         for id_key, list_index in self._index_dict.items():
             if list_index >= index:
                 self._index_dict[id_key] = list_index + 1
+        self._index_dict[item_id] = index
         self._size += 1
 
     def pop(self, index: int = -1) -> ELEMENT_T:
@@ -231,13 +231,12 @@ class IDList[ELEMENT_T]:
         item_id = id(item)
         if item_id in self._index_dict:
             return self._index_dict[item_id]
-        print("ITEMS:")
-        for o in self._list:
-            print("   ", o.name, id(o), id(o) in self._index_dict)
         raise ValueError(f"Item `{item.name}` (ID {item_id}) is not in `IDList`.")
 
-    def copy(self) -> IDList[ELEMENT_T]:
-        new_list = IDList()
+    def copy(self) -> tp.Self:
+        new_list = self.__class__.__new__(self.__class__)
+        # Subclass attributes (e.g. `MSBEntryList.supertype`) must survive the copy.
+        new_list.__dict__.update(self.__dict__)
         new_list._list = self._list.copy()
         new_list._index_dict = self._index_dict.copy()
         new_list._size = self._size
@@ -272,11 +271,13 @@ class IDList[ELEMENT_T]:
     def __contains__(self, item: ELEMENT_T) -> bool:
         return id(item) in self._index_dict
 
-    def __eq__(self, other: IDList) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Equal if dictionaries are exactly equal, ignoring dictionary order."""
+        if not isinstance(other, IDList):
+            return NotImplemented
         return self._index_dict == other._index_dict
 
-    def __ne__(self, other: IDList) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
     def __hash__(self) -> int:
@@ -284,12 +285,17 @@ class IDList[ELEMENT_T]:
         return hash(tuple(self._index_dict))
 
     def __setstate__(self, state):
-        """We need to reconstruct the index dictionary from the list."""
-        self._list = state["_list"]
-        self._index_dict = state["_index_dict"]
-        self._size = state["_size"]
-        # Refresh indices in dict.
+        """Restore all attributes, then rebuild the index dictionary.
+
+        The unpickled/copied `_index_dict` is keyed by the *source* objects' `id()` values, which mean nothing in this
+        process (and may even have been reused), so it must be regenerated from the restored list. Everything else in
+        `state` is restored verbatim so that subclass attributes — e.g. `MSBEntryList.supertype` and `entry_class` —
+        survive `copy.deepcopy()` and pickling.
+        """
+        self.__dict__.update(state)
+        self._list = list(state["_list"])
         self._index_dict = {id(item): i for i, item in enumerate(self._list)}
+        self._size = len(self._list)
 
     def __repr__(self) -> str:
         return f"IDList({self._list})"
