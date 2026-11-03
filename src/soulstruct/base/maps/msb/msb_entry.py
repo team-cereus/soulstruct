@@ -278,8 +278,8 @@ class MSBEntry(abc.ABC):
             except KeyError:
                 raise ValueError(f"Struct offset not found for `{struct_name}` in `{cls.__name__}`.")
             if struct_type is None:
-                if struct_offset != 0:
-                    raise ValueError(f"Offset for unused struct `{struct_name}` in `{cls.__name__}` is non-zero.")
+                # Nothing to read. (This used to assert a zero offset, but compared the absolute offset, which is
+                # never zero, so any entry with an unused struct failed; Nightreign also leaves leftover offsets.)
                 continue
             if struct_offset == 0:
                 # `STRUCTS` class attribute enforces which structs must be present in subtype.
