@@ -257,7 +257,8 @@ def decompress(comp_buf: bytes, decompressed_size: int):
 
 def find_oodle_dll() -> str:
     """Try to find DLL at Soulstruct, Sekiro, Elden Ring, or Nightreign paths."""
-    dll_names = (__DLL_NAME, "oo2core_9_win64.dll")
+    # NOT `oo2core_9_win64.dll` (all Nightreign ships): it loads, then segfaults on the first decompress.
+    dll_names = (__DLL_NAME,)
     search_dirs = (
         SOULSTRUCT_PATH("."),
         SOULSTRUCT_PATH(".."),
@@ -275,7 +276,7 @@ def find_oodle_dll() -> str:
 
     # DLL not found in one of these default locations.
     _LOGGER.warning(
-        f"Could not find `oo2core_6_win64.dll` or `oo2core_9_win64.dll` in Soulstruct, Sekiro, Elden Ring, "
+        f"Could not find `oo2core_6_win64.dll` in Soulstruct, Sekiro, Elden Ring, "
         f"or Nightreign paths.\n"
         f"You will not be able to compress/decompress Sekiro, Elden Ring, or Nightreign files using Soulstruct.\n"
         f"Call `oodle.LOAD_DLL(path)` to load the DLL from an arbitrary path."
