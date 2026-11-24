@@ -527,6 +527,27 @@ class FLVER(GameFile):
 
         return writer
 
+    def _pack_flver2_skeleton_set(self, writer: BinaryWriter):
+        """Write the skeleton set (FLVER2 version >= 0x2001A) from the bone hierarchy: base and full skeleton both
+        list every bone in order, as vanilla static assets do."""
+        count = len(self.bones)
+        start = writer.position
+        header_size = 0x20
+        entry_size = 0x10
+        writer.pack("hhII", count, count, start + header_size, start + header_size + count * entry_size)
+        writer.pad(20)
+        for _ in range(2):
+            for i, bone in enumerate(self.bones):
+                writer.pack(
+                    "hhhhii",
+                    bone.parent_bone_index,
+                    bone.child_bone_index,
+                    bone.next_sibling_bone_index,
+                    bone.previous_sibling_bone_index,
+                    i,
+                    0,
+                )
+
     def to_flver2_writer(self) -> BinaryWriter:
 
         byte_order = ByteOrder.big_endian_bool(self.big_endian)
@@ -680,7 +701,13 @@ class FLVER(GameFile):
             material.pack_flver2_textures(writer, first_texture_index=first_texture_index)
             first_texture_index += len(material.textures)
 
-        # TODO: Write unknown Sekiro struct here.
+        if self.version >= 0x2001A:
+            # Sekiro / Elden Ring / Nightreign: skeleton set after the textures (SoulsFormats `FLVER2.SkeletonSet`):
+            # two int16 counts, two offsets, five zero ints, then the base and the full skeleton, one 16-byte entry
+            # per bone (parent, first child, next sibling, previous sibling as int16, node index, zero). Vanilla
+            # single-node assets (NR AEG023_666, AEG023_133) hold one entry in each list. Without this struct
+            # SoulsFormats (Smithbox, MapKit) cannot read the file: it takes the layout members for it.
+            self._pack_flver2_skeleton_set(writer)
 
         # Indexed data only after this point, aligning to 16 bytes between each data type.
 
