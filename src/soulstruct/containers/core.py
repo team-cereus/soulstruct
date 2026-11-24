@@ -892,9 +892,13 @@ class Binder(BaseBinaryFile):
                 entry_header.pack_path(header_writer, entry.get_packed_path(encoding=path_encoding))
 
         if self.v4_info.hash_table_type == 4:
-            header_writer.fill_with_position("_hash_table_offset", obj=self)
+            # FromSoft (and SoulsFormats) align the hash table to 8 bytes after the entry paths. Without the padding,
+            # an odd path length leaves it at e.g. 0xFC and SoulsFormats' `BND4.Read` rejects the binder (2026-11-24:
+            # a new GEOMBND from the Blender add-on was unreadable in Smithbox / MapKit).
+            header_writer.pad_align(8)
+            hash_table_offset = header_writer.fill_with_position("_hash_table_offset", obj=self)
             if rebuild_hash_table:
-                header_writer.append(BinderHashTable.build_hash_table(self.entries))
+                header_writer.append(BinderHashTable.build_hash_table(sorted_entries, hash_table_offset))
             else:
                 header_writer.append(self.v4_info.most_recent_hash_table)
         else:

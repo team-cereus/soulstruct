@@ -6,7 +6,8 @@ from soulstruct.utilities.binary import *
 
 
 class HashTableHeader(BinaryStruct):
-    _pad1: bytes = binary_pad(8, init=False)
+    # The binder header's hash table offset points straight at this struct (8-aligned); `path_hashes_offset` is
+    # absolute in the file (vanilla ER / NR GEOMBNDs, SoulsFormats `BinderHashTable.Write`).
     path_hashes_offset: long
     hash_group_count: uint
     _unknown3: int = binary(asserted=0x00080810, init=False)
@@ -25,9 +26,12 @@ class HashGroup(BinaryStruct):
 class BinderHashTable:
 
     @classmethod
-    def build_hash_table(cls, entries):
+    def build_hash_table(cls, entries, table_offset: int = 0):
         """Some binder files include tables of hashed entry paths, which aren't needed to read file contents, but
-        need to be re-hashed to properly pack the file in case any paths have changed (or the number of entries)."""
+        need to be re-hashed to properly pack the file in case any paths have changed (or the number of entries).
+
+        `entries` must be in the order they are written to the binder (sorted by entry ID); `table_offset` is the
+        absolute file offset the table is written at, as its path hash offset is absolute."""
 
         # Group count set to first prime number greater than or equal to the number of entries divided by 7.
         for p in range(len(entries) // 7, 100000):
@@ -61,7 +65,7 @@ class BinderHashTable:
 
         packed_hash_groups = HashGroup.join_bytes(hash_groups)
         packed_hash_table_header = bytes(HashTableHeader(
-            path_hashes_offset=long(HashTableHeader.get_size() + len(packed_hash_groups)),
+            path_hashes_offset=long(table_offset + HashTableHeader.get_size() + len(packed_hash_groups)),
             hash_group_count=uint(group_count),
         ))
         packed_path_hashes = PathHash.join_bytes(path_hashes)
